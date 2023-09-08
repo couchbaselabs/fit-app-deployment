@@ -12,5 +12,7 @@ jobs:
           go-version: 1.19
       - name: clone the FIT and couchbase-jvm-clients repo
         run: |
+          git config --get user.name
+          git config --get user.email
           git clone https://github.com/couchbaselabs/transactions-fit-performer.git
           git clone https://github.com/couchbase/couchbase-jvm-clients.git
