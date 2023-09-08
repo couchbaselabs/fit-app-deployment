@@ -10,7 +10,7 @@ jobs:
       - uses: actions/setup-go@v2
         with:
           go-version: 1.19
-      - name: clone transaction fit performer repo
-        run: git clone https://github.com/couchbaselabs/transactions-fit-performer.git
-      - name: clone couchbase-jvm-clients repo
-        run: git clone https://github.com/couchbase/couchbase-jvm-clients.git
+      - name: clone the FIT and couchbase-jvm-clients repo
+        run: |
+          git clone https://github.com/couchbaselabs/transactions-fit-performer.git
+          git clone https://github.com/couchbase/couchbase-jvm-clients.git
