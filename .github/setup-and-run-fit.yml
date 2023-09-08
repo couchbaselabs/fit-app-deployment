@@ -1,0 +1,20 @@
+name: Run FIT Tests
+run-name: ${{ github.actor }} Running FIT tests on cbdinoclusters
+on: [push]
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-go@v2
+        with:
+          go-version: 1.19
+      - name: install sudo
+        run: apt-get install sudo
+      - name: install git
+        run: sudo apt update, sudo apt install git
+      - name: clone transaction fit performer repo
+        run: git clone https://github.com/couchbaselabs/transactions-fit-performer.git
+      - name: clone couchbase-jvm-clients repo
+        run: git clone https://github.com/couchbase/couchbase-jvm-clients.git
