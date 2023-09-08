@@ -10,8 +10,6 @@ jobs:
       - uses: actions/setup-go@v2
         with:
           go-version: 1.19
-      - name: install sudo
-        run: apt-get install sudo
       - name: install git
         run: sudo apt update, sudo apt install git
       - name: clone transaction fit performer repo
