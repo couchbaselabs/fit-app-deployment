@@ -12,18 +12,16 @@ jobs:
           token: ${{ secrets.PAT_TOKEN }}
           # repository: couchbaselabs/transactions-fit-performer
           # path: transactions-fit-performer
-      # - name: Configure SSH
-      #   run: |
-      #     git config --global user.name "littlefermatlives"
-      #     git config --global user.email "saurabhmishra16121999@gmail.com"
-      #     mkdir -p ~/.ssh
-      #     echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
-      #     chmod 600 ~/.ssh/id_rsa
-      #     echo "saurabh" > ~/.ssh/id_rsa_passphrase
-      #     chmod 600 ~/.ssh/id_rsa_passphrase
-      #     ssh-keyscan github.com >> ~/.ssh/known_hosts
-      #   env:
-      #     SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+      - name: Configure SSH
+        run: |
+          git config --global user.name "littlefermatlives"
+          git config --global user.email "saurabhmishra16121999@gmail.com"
+          mkdir -p ~/.ssh
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan github.com >> ~/.ssh/known_hosts
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
 
       # - name: Authenticate with GitHub CLI
       #   run: |
@@ -32,7 +30,7 @@ jobs:
 
       - name: change directory to FIT
         run: |
-          git clone https://$GITHUB_ACTOR:${{ secrets.PAT_TOKEN }}@github.com/couchbaselabs/transactions-fit-performer.git
+          git clone git@github.com:couchbaselabs/transactions-fit-performer.git
           cd transactions-fit-performer
           # Replace with the actual script or command you want to run.
         env:
