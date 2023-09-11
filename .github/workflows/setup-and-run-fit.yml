@@ -9,9 +9,9 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-go@v2
         with:
-          token: ${{ secrets.PAT }}
-          repository: couchbaselabs/transactions-fit-performer
-          path: transactions-fit-performer
+          token: ${{ secrets.PAT_TOKEN }}
+          # repository: couchbaselabs/transactions-fit-performer
+          # path: transactions-fit-performer
       # - name: Configure SSH
       #   run: |
       #     git config --global user.name "littlefermatlives"
@@ -32,7 +32,7 @@ jobs:
 
       - name: change directory to FIT
         run: |
-          git clone https://github.com/couchbaselabs/transactions-fit-performer.git
+          git clone https://$GITHUB_ACTOR:${{ secrets.PAT_TOKEN }}@github.com/couchbaselabs/transactions-fit-performer.git
           cd transactions-fit-performer
           # Replace with the actual script or command you want to run.
         env:
