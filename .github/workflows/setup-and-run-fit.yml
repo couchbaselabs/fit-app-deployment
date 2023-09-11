@@ -23,11 +23,6 @@ jobs:
       #   env:
       #     SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
 
-      - name: Install GitHub CLI
-        run: |
-          # Install GitHub CLI
-          brew install gh
-
       - name: Authenticate with GitHub CLI
         run: |
           # Authenticate with the GitHub CLI using the GH_TOKEN
