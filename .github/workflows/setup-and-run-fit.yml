@@ -10,6 +10,7 @@ jobs:
       - uses: actions/setup-go@v2
         with:
           go-version: 1.19
+          ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
       # - name: Configure SSH
       #   run: |
       #     git config --global user.name "littlefermatlives"
@@ -30,7 +31,7 @@ jobs:
 
       - name: Clone and Run Repository
         run: |
-          gh repo clone couchbaselabs/transactions-fit-performer
+          git@github.com:couchbaselabs/transactions-fit-performer.git
           cd transactions-fit-performer
           # Replace with the actual script or command you want to run.
         env:
