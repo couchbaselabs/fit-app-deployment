@@ -32,6 +32,7 @@ jobs:
 
       - name: change directory to FIT
         run: |
+          git clone https://github.com/couchbaselabs/transactions-fit-performer.git
           cd transactions-fit-performer
           # Replace with the actual script or command you want to run.
         env:
