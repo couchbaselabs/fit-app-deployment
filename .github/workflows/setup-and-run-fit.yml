@@ -25,7 +25,7 @@ jobs:
 
       - name: Clone and Run Repository
         run: |
-          git clone git@github.com:couchbaselabs/transactions-fit-performer.git
+          gh repo clone couchbaselabs/transactions-fit-performer
           cd transactions-fit-performer
           # Replace with the actual script or command you want to run.
         env:
