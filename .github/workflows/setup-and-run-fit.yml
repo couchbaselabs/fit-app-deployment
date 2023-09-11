@@ -5,23 +5,29 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
+    # steps:
+    #   - uses: actions/checkout@v2
+    #   - uses: actions/setup-go@v2
+    #     with:
+    #       token: ${{ secrets.PAT_TOKEN }}
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-go@v2
+      - name: Setup SSH
+        uses: MrSquaare/ssh-setup-action@v1
         with:
-          token: ${{ secrets.PAT_TOKEN }}
+            host: github.com
+            private-key: ${{ secrets.SSH_PRIVATE_KEY }}
           # repository: couchbaselabs/transactions-fit-performer
           # path: transactions-fit-performer
-      - name: Configure SSH
-        run: |
-          git config --global user.name "littlefermatlives"
-          git config --global user.email "saurabhmishra16121999@gmail.com"
-          mkdir -p ~/.ssh
-          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
-          chmod 600 ~/.ssh/id_ed25519
-          ssh-keyscan github.com >> ~/.ssh/known_hosts
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+      # - name: Configure SSH
+      #   run: |
+      #     git config --global user.name "littlefermatlives"
+      #     git config --global user.email "saurabhmishra16121999@gmail.com"
+      #     mkdir -p ~/.ssh
+      #     echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
+      #     chmod 600 ~/.ssh/id_ed25519
+      #     ssh-keyscan github.com >> ~/.ssh/known_hosts
+      #   env:
+      #     SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
 
       # - name: Authenticate with GitHub CLI
       #   run: |
