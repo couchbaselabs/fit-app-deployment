@@ -5,39 +5,25 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
-    # steps:
-    #   - uses: actions/checkout@v2
-    #   - uses: actions/setup-go@v2
-    #     with:
-    #       token: ${{ secrets.PAT_TOKEN }}
     steps:
+      - uses: actions/checkout@v3
+      - name: Set up Maven Central Repository
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          server-id: ossrh
+          server-username: MAVEN_USERNAME
+          server-password: MAVEN_PASSWORD
       - name: Setup SSH
         uses: MrSquaare/ssh-setup-action@v1
         with:
             host: github.com
             private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-          # repository: couchbaselabs/transactions-fit-performer
-          # path: transactions-fit-performer
-      # - name: Configure SSH
-      #   run: |
-      #     git config --global user.name "littlefermatlives"
-      #     git config --global user.email "saurabhmishra16121999@gmail.com"
-      #     mkdir -p ~/.ssh
-      #     echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
-      #     chmod 600 ~/.ssh/id_ed25519
-      #     ssh-keyscan github.com >> ~/.ssh/known_hosts
-      #   env:
-      #     SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-
-      # - name: Authenticate with GitHub CLI
-      #   run: |
-      #     # Authenticate with the GitHub CLI using the GH_TOKEN
-      #     gh auth login --with-token <<< $GH_TOKEN
-
       - name: change directory to FIT
         run: |
           git clone git@github.com:couchbaselabs/transactions-fit-performer.git
           cd transactions-fit-performer
-          # Replace with the actual script or command you want to run.
+          mvn clean install -Dmaven.test.skip
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
