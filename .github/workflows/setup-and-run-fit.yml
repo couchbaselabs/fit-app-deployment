@@ -54,5 +54,7 @@ jobs:
       #       }
       - name: Edit values from the FITConfiguration.json
         run: |
-          echo "`jq '.excludeTests=[]' test-driver/FITConfiguration.example.json`" > test-driver/FITConfiguration.json
-          echo "`jq '.situational.capella.url="dev.nonprod."' test-driver/FITConfiguration.example.json`" > test-driver/FITConfiguration.json
+          ls
+          pwd 
+          echo "`jq '.excludeTests=[]' ./test-driver/FITConfiguration.example.json`" > ./test-driver/FITConfiguration.json
+          echo "`jq '.situational.capella.url="dev.nonprod."' ./test-driver/FITConfiguration.example.json`" > ./test-driver/FITConfiguration.json
