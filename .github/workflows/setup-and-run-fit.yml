@@ -55,5 +55,5 @@ jobs:
       - name: Edit values from the FITConfiguration.json
         run: |
           cd transactions-fit-performer/test-driver
-          echo "`jq '.excludeTests=[]' FITConfiguration.example.json`" > FITConfiguration.json
-          echo "`jq '.situational.capella.url="dev.nonprod."' FITConfiguration.example.json`" > FITConfiguration.json
+          echo "`jq '.excludeTests=${{ env.EXCLUDETESTS}}' FITConfiguration.example.json`" > FITConfiguration.json
+          echo "`jq '.situational.capella.url=${{ env.URL }}' FITConfiguration.example.json`" > FITConfiguration.json
