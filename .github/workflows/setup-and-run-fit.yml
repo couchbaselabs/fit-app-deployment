@@ -62,4 +62,9 @@ jobs:
           cat FITConfiguration.json
       - name: Run FIT tests
         run: |
+          cd transactions-fit-performer
+          cd gRPC/jvm
+          rm -rf src
+          rm -rf target
+          cd ../..
           mvn install
