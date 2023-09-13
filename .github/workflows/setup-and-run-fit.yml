@@ -31,32 +31,33 @@ jobs:
         run: |
           git clone git@github.com:couchbaselabs/transactions-fit-performer.git
           cd transactions-fit-performer
-          docker build --no-cache -f test-driver/Dockerfile -t fit/test-driver:latest .
+          # docker build --no-cache -f test-driver/Dockerfile -t fit/test-driver:latest .
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-      - name: setup jenkins sdk
-        run: |
-          git clone git@github.com:couchbaselabs/jenkins-sdk.git
-          cd jenkins-sdk
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+      # - name: setup jenkins sdk
+      #   run: |
+      #     git clone git@github.com:couchbaselabs/jenkins-sdk.git
+      #     cd jenkins-sdk
+      #   env:
+      #     SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
       - name: create FIT network
         run: |
           docker network create fit  
-      - name: start java performer
-        run: |
-          cd jenkins-sdk
-          ./gradlew buildPerformer --args="-d ../ -i java-performer -s java-sdk"
-          cd ..
-          cd couchbase-jvm-clients
-          docker run --network=fit -dit --rm --expose 8060 java-performer
+      # - name: start java performer
+      #   run: |
+      #     cd jenkins-sdk
+      #     ./gradlew buildPerformer --args="-d ../ -i java-performer -s java-sdk"
+      #     cd ..
+      #     cd couchbase-jvm-clients
+      #     docker run --network=fit -dit --rm --expose 8060 java-performer
       - name: Edit values from the FITConfiguration.json
         run: |
           cd transactions-fit-performer/test-driver
           # echo "`jq '.excludeTests=${{ env.EXCLUDETESTS}}' FITConfiguration.example.json`" > FITConfiguration.json
           # echo "`jq '.situational.capella.url=${{ env.URL }}' FITConfiguration.example.json`" > FITConfiguration.json
           # echo "`jq '.excludeTests="saurabh"' FITConfiguration.example.json`" > FITConfiguration.json
-          echo "`jq '.situational.capella.url=$SSH_PRIVATE_KEY' FITConfiguration.example.json`" > FITConfiguration.json
+          echo URL var as env = $ {{ env.URL }}
+          echo "`jq '.situational.capella.url=$URL' FITConfiguration.example.json`" > FITConfiguration.json
           # echo "`jq '.excludeTests=[]' FITConfiguration.json`" > FITConfiguration.json
           # echo "`jq '.situational.capella.accessKey="esxjfT2VR1hVXAEgafBI5uob3jNgr9Ca"' FITConfiguration.json`" > FITConfiguration.json
           # echo "`jq '.situational.capella.privateKey="sX!g!XILDBgZYpKuCe23@qIsBU5scDMkD!HW%lfifgzlj82MauSkrhKT@wf%qXBA"' FITConfiguration.json`" > FITConfiguration.json
