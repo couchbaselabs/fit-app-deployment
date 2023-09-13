@@ -57,8 +57,8 @@ jobs:
           # echo "`jq '.situational.capella.url=${{ env.URL }}' FITConfiguration.example.json`" > FITConfiguration.json
           # echo "`jq '.excludeTests="saurabh"' FITConfiguration.example.json`" > FITConfiguration.json
           # export URL=${{ env.URL }}
-          echo ${{ secrets.SSH_PRIVATE_KEY }}
-          echo "`jq --arg e "${{ env.URL }}" '.situational.capella.url=$e' FITConfiguration.example.json`" > FITConfiguration.json
+          echo ${{ vars.URL }}
+          echo "`jq --arg e "${{ vars.URL }}" '.situational.capella.url=$e' FITConfiguration.example.json`" > FITConfiguration.json
           # echo "`jq '.excludeTests=[]' FITConfiguration.json`" > FITConfiguration.json
           # echo "`jq '.situational.capella.accessKey="esxjfT2VR1hVXAEgafBI5uob3jNgr9Ca"' FITConfiguration.json`" > FITConfiguration.json
           # echo "`jq '.situational.capella.privateKey="sX!g!XILDBgZYpKuCe23@qIsBU5scDMkD!HW%lfifgzlj82MauSkrhKT@wf%qXBA"' FITConfiguration.json`" > FITConfiguration.json
