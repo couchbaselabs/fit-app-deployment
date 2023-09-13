@@ -69,8 +69,6 @@ jobs:
           # echo "`jq '.situational.capella.cloudProvider="AWS"' FITConfiguration.json`" > FITConfiguration.json
           # echo "`jq '.situational.capella.region="us-east-1a"' FITConfiguration.json`" > FITConfiguration.json
           cat FITConfiguration.json
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
       # - name: Run FIT tests
       #   run: |
       #     cd transactions-fit-performer
