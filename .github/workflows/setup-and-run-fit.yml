@@ -56,7 +56,17 @@ jobs:
           # echo "`jq '.excludeTests=${{ env.EXCLUDETESTS}}' FITConfiguration.example.json`" > FITConfiguration.json
           # echo "`jq '.situational.capella.url=${{ env.URL }}' FITConfiguration.example.json`" > FITConfiguration.json
           # echo "`jq '.excludeTests="saurabh"' FITConfiguration.example.json`" > FITConfiguration.json
-          echo "`jq '.situational.capella.url="saurabh"' FITConfiguration.json`" > FITConfiguration.json
+          echo "`jq '.situational.capella.url="dev.nonprod-project-avengers.com"' FITConfiguration.json`" > FITConfiguration.json
+          echo "`jq '.excludeTests=[]' FITConfiguration.json`" > FITConfiguration.json
+          echo "`jq '.situational.capella.accessKey="esxjfT2VR1hVXAEgafBI5uob3jNgr9Ca"' FITConfiguration.json`" > FITConfiguration.json
+          echo "`jq '.situational.capella.privateKey="sX!g!XILDBgZYpKuCe23@qIsBU5scDMkD!HW%lfifgzlj82MauSkrhKT@wf%qXBA"' FITConfiguration.json`" > FITConfiguration.json
+          echo "`jq '.situational.capella.projectId="538ff549-bf26-4f6b-b047-df705ac4d18d"' FITConfiguration.json`" > FITConfiguration.json
+          echo "`jq '.situational.capella.tenantId="6af08c0a-8cab-4c1c-b257-b521575c16d0"' FITConfiguration.json`" > FITConfiguration.json
+          echo "`jq '.situational.capella.username="saurabh.mishra@couchbase.com"' FITConfiguration.json`" > FITConfiguration.json
+          echo "`jq '.situational.capella.password="Saurabh16@"' FITConfiguration.json`" > FITConfiguration.json
+          echo "`jq '.situational.capella.overrideToken="Saurabh16@"' FITConfiguration.json`" > FITConfiguration.json
+          echo "`jq '.situational.capella.cloudProvider="AWS"' FITConfiguration.json`" > FITConfiguration.json
+          echo "`jq '.situational.capella.region="us-east-1a"' FITConfiguration.json`" > FITConfiguration.json
           cat FITConfiguration.json
       - name: Run FIT tests
         run: |
