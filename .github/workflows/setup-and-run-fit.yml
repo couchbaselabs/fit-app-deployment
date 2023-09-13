@@ -9,7 +9,7 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     environment:
-      name: test
+      name: env
     steps:
       - uses: actions/checkout@v3
       - name: Set up Maven Central Repository
@@ -61,9 +61,8 @@ jobs:
           # echo "`jq '.excludeTests=${{ env.EXCLUDETESTS}}' FITConfiguration.example.json`" > FITConfiguration.json
           # echo "`jq '.situational.capella.url=${{ env.URL }}' FITConfiguration.example.json`" > FITConfiguration.json
           # echo "`jq '.excludeTests="saurabh"' FITConfiguration.example.json`" > FITConfiguration.json
-          URL=${{vars.URL}}"
-          echo "URL=$URL" >> $GITHUB_OUTPUT
-          echo "`jq --arg e "${{needs.init.outputs.URL}}" '.situational.capella.url=$e' FITConfiguration.example.json`" > FITConfiguration.json
+          echo ${{ vars.URL }}
+          echo "`jq --arg e "${{ vars.URL }}" '.situational.capella.url=$e' FITConfiguration.example.json`" > FITConfiguration.json
           # echo "`jq '.excludeTests=[]' FITConfiguration.json`" > FITConfiguration.json
           # echo "`jq '.situational.capella.accessKey="esxjfT2VR1hVXAEgafBI5uob3jNgr9Ca"' FITConfiguration.json`" > FITConfiguration.json
           # echo "`jq '.situational.capella.privateKey="sX!g!XILDBgZYpKuCe23@qIsBU5scDMkD!HW%lfifgzlj82MauSkrhKT@wf%qXBA"' FITConfiguration.json`" > FITConfiguration.json
