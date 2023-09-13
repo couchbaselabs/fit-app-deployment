@@ -42,9 +42,7 @@ jobs:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
       - name: create FIT network
         run: |
-          docker network create fit
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}  
+          docker network create fit  
       - name: start java performer
         run: |
           cd jenkins-sdk
@@ -57,7 +55,7 @@ jobs:
           cd transactions-fit-performer/test-driver
           # echo "`jq '.excludeTests=${{ env.EXCLUDETESTS}}' FITConfiguration.example.json`" > FITConfiguration.json
           # echo "`jq '.situational.capella.url=${{ env.URL }}' FITConfiguration.example.json`" > FITConfiguration.json
-          echo "`jq '.excludeTests="saurabh"' FITConfiguration.example.json`" > FITConfiguration.json
+          # echo "`jq '.excludeTests="saurabh"' FITConfiguration.example.json`" > FITConfiguration.json
           echo "`jq '.situational.capella.url="saurabh"' FITConfiguration.json`" > FITConfiguration.json
           cat FITConfiguration.json
       - name: Run FIT tests
