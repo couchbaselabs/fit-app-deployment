@@ -24,7 +24,7 @@ jobs:
         run: |
           git clone git@github.com:couchbase/couchbase-jvm-clients.git
           cd couchbase-jvm-clients
-          make
+          # make
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
       - name: setup fit 
@@ -41,7 +41,15 @@ jobs:
         run: |
           git clone git@github.com:couchbaselabs/jenkins-sdk.git
           cd jenkins-sdk
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+      - name: start java performer
+        run: |
+          cd jenkins-sdk
           ./gradlew buildPerformer --args="-d ../ -i java-performer -s java-sdk"
+          cd ..
+          cd couchbase-jvm-clients
+          docker run --network=fit -dit --rm --expose 8060 java-performer
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
       # - name: Set and Get values from the FITConfiguration.json
