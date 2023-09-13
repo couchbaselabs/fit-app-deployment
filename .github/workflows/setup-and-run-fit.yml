@@ -1,9 +1,6 @@
 name: Run FIT Tests
 run-name: ${{ github.actor }} Running FIT tests on cbdinoclusters
 on: [push]
-env:
-  # Setting an environment variable with the value of a configuration variable
-  env_var: ${{ vars.ENV_CONTEXT_VAR }}
 jobs:
   build:
     name: Build
@@ -29,14 +26,14 @@ jobs:
         run: |
           git clone git@github.com:couchbase/couchbase-jvm-clients.git
           cd couchbase-jvm-clients
-          # make
+          make
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
       - name: setup fit 
         run: |
           git clone git@github.com:couchbaselabs/transactions-fit-performer.git
           cd transactions-fit-performer
-          # docker build --no-cache -f test-driver/Dockerfile -t fit/test-driver:latest .
+          docker build --no-cache -f test-driver/Dockerfile -t fit/test-driver:latest .
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
       - name: setup jenkins sdk
@@ -45,16 +42,16 @@ jobs:
           cd jenkins-sdk
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-      # - name: create FIT network
-      #   run: |
-      #     docker network create fit  
-      # - name: start java performer
-      #   run: |
-      #     cd jenkins-sdk
-      #     ./gradlew buildPerformer --args="-d ../ -i java-performer -s java-sdk"
-      #     cd ..
-      #     cd couchbase-jvm-clients
-      #     docker run --network=fit -dit --rm --expose 8060 java-performer
+      - name: create FIT network
+        run: |
+          docker network create fit  
+      - name: start java performer
+        run: |
+          cd jenkins-sdk
+          ./gradlew buildPerformer --args="-d ../ -i java-performer -s java-sdk"
+          cd ..
+          cd couchbase-jvm-clients
+          docker run --network=fit -dit --rm --expose 8060 java-performer
       - name: Edit values from the FITConfiguration.json
         run: |
           cd transactions-fit-performer/test-driver
@@ -70,11 +67,11 @@ jobs:
           echo "`jq --arg e "${{ vars.CLOUDPROVIDER }}" '.situational.capella.cloudProvider=$e' FITConfiguration.json`" > FITConfiguration.json
           echo "`jq --arg e "${{ vars.REGION }}" '.situational.capella.region=$e' FITConfiguration.json`" > FITConfiguration.json
           cat FITConfiguration.json
-      # - name: Run FIT tests
-      #   run: |
-      #     cd transactions-fit-performer
-      #     cd gRPC/jvm
-      #     rm -rf src
-      #     rm -rf target
-      #     cd ../..
-      #     mvn install
+      - name: Run FIT tests
+        run: |
+          cd transactions-fit-performer
+          cd gRPC/jvm
+          rm -rf src
+          rm -rf target
+          cd ../..
+          mvn install
