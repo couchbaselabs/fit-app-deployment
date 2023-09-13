@@ -56,7 +56,7 @@ jobs:
           # echo "`jq '.excludeTests=${{ env.EXCLUDETESTS}}' FITConfiguration.example.json`" > FITConfiguration.json
           # echo "`jq '.situational.capella.url=${{ env.URL }}' FITConfiguration.example.json`" > FITConfiguration.json
           # echo "`jq '.excludeTests="saurabh"' FITConfiguration.example.json`" > FITConfiguration.json
-          export URL = $ {{ env.URL }}
+          export URL = ${{ env.URL }}
           echo "`jq '.situational.capella.url=$URL' FITConfiguration.example.json`" > FITConfiguration.json
           # echo "`jq '.excludeTests=[]' FITConfiguration.json`" > FITConfiguration.json
           # echo "`jq '.situational.capella.accessKey="esxjfT2VR1hVXAEgafBI5uob3jNgr9Ca"' FITConfiguration.json`" > FITConfiguration.json
