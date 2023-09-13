@@ -32,6 +32,7 @@ jobs:
           # cd ..
           git clone git@github.com:couchbaselabs/transactions-fit-performer.git
           cd transactions-fit-performer
+          docker build --no-cache -f test-driver/Dockerfile -t fit/test-driver:latest .
           # mvn clean install -Dmaven.test.skip
           # cp test-driver/FITConfiguration.example.json test-driver/FITConfiguration.json
         env:
