@@ -20,13 +20,13 @@ jobs:
         with:
             host: github.com
             private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-      # - name: setup couchbase jvm client 
-      #   run: |
-      #     git clone git@github.com:couchbase/couchbase-jvm-clients.git
-      #     cd couchbase-jvm-clients
-      #     make
-      #   env:
-      #     SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+      - name: setup couchbase jvm client 
+        run: |
+          git clone git@github.com:couchbase/couchbase-jvm-clients.git
+          cd couchbase-jvm-clients
+          make
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
       - name: setup fit 
         run: |
           # cd ..
@@ -35,6 +35,13 @@ jobs:
           docker build --no-cache -f test-driver/Dockerfile -t fit/test-driver:latest .
           # mvn clean install -Dmaven.test.skip
           # cp test-driver/FITConfiguration.example.json test-driver/FITConfiguration.json
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+      - name: setup jenkins sdk
+        run: |
+          git clone git@github.com:couchbaselabs/jenkins-sdk.git
+          cd jenkins-sdk
+          ./gradlew buildPerformer --args="-d ../ -i java-performer -s java-sdk"
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
       # - name: Set and Get values from the FITConfiguration.json
