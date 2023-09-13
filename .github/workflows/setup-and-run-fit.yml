@@ -32,8 +32,6 @@ jobs:
           git clone git@github.com:couchbaselabs/transactions-fit-performer.git
           cd transactions-fit-performer
           docker build --no-cache -f test-driver/Dockerfile -t fit/test-driver:latest .
-          # mvn clean install -Dmaven.test.skip
-          # cp test-driver/FITConfiguration.example.json test-driver/FITConfiguration.json
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
       - name: setup jenkins sdk
@@ -54,24 +52,6 @@ jobs:
           cd ..
           cd couchbase-jvm-clients
           docker run --network=fit -dit --rm --expose 8060 java-performer
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-      # - name: Set and Get values from the FITConfiguration.json
-      #   id: configJson
-      #   uses: RadovanPelka/github-action-json@main
-      #   with:
-      #     path: "test-driver/FITConfiguration.json"
-      #     replaceWith: |
-      #       {
-      #         "situational": { "capella" : { "url" : ${{  }} } }
-      #         "situational": { "capella" : { "accessKey" : ${{  }} } }
-      #         "situational": { "capella" : { "privateKey" : ${{  }} } }
-      #         "situational": { "capella" : { "projectId" : ${{  }} } }
-      #         "situational": { "capella" : { "tenantId" : ${{  }} } }
-      #         "situational": { "capella" : { "username" : ${{  }} } }
-      #         "situational": { "capella" : { "password" : ${{  }} } }
-      #         "excludeTests": []
-      #       }
       - name: Edit values from the FITConfiguration.json
         run: |
           cd transactions-fit-performer/test-driver
@@ -80,3 +60,6 @@ jobs:
           echo "`jq '.excludeTests="saurabh"' FITConfiguration.example.json`" > FITConfiguration.json
           echo "`jq '.situational.capella.url="saurabh"' FITConfiguration.json`" > FITConfiguration.json
           cat FITConfiguration.json
+      - name: Run FIT tests
+        run: |
+          mvn install
