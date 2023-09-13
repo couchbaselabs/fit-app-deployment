@@ -58,24 +58,18 @@ jobs:
       - name: Edit values from the FITConfiguration.json
         run: |
           cd transactions-fit-performer/test-driver
-          # echo "`jq '.excludeTests=${{ env.EXCLUDETESTS}}' FITConfiguration.example.json`" > FITConfiguration.json
-          # echo "`jq '.situational.capella.url=${{ env.URL }}' FITConfiguration.example.json`" > FITConfiguration.json
-          # echo "`jq '.excludeTests="saurabh"' FITConfiguration.example.json`" > FITConfiguration.json
-          echo ${{ vars.URL }}
           echo "`jq --arg e "${{ vars.URL }}" '.situational.capella.url=$e' FITConfiguration.example.json`" > FITConfiguration.json
-          # echo "`jq '.excludeTests=[]' FITConfiguration.json`" > FITConfiguration.json
-          # echo "`jq '.situational.capella.accessKey="esxjfT2VR1hVXAEgafBI5uob3jNgr9Ca"' FITConfiguration.json`" > FITConfiguration.json
-          # echo "`jq '.situational.capella.privateKey="sX!g!XILDBgZYpKuCe23@qIsBU5scDMkD!HW%lfifgzlj82MauSkrhKT@wf%qXBA"' FITConfiguration.json`" > FITConfiguration.json
-          # echo "`jq '.situational.capella.projectId="538ff549-bf26-4f6b-b047-df705ac4d18d"' FITConfiguration.json`" > FITConfiguration.json
-          # echo "`jq '.situational.capella.tenantId="6af08c0a-8cab-4c1c-b257-b521575c16d0"' FITConfiguration.json`" > FITConfiguration.json
-          # echo "`jq '.situational.capella.username="saurabh.mishra@couchbase.com"' FITConfiguration.json`" > FITConfiguration.json
-          # echo "`jq '.situational.capella.password="Saurabh16@"' FITConfiguration.json`" > FITConfiguration.json
-          # echo "`jq '.situational.capella.overrideToken="Saurabh16@"' FITConfiguration.json`" > FITConfiguration.json
-          # echo "`jq '.situational.capella.cloudProvider="AWS"' FITConfiguration.json`" > FITConfiguration.json
-          # echo "`jq '.situational.capella.region="us-east-1a"' FITConfiguration.json`" > FITConfiguration.json
+          echo "`jq --arg e "${{ vars.EXCLUDETESTS }}" '.excludeTests=$e' FITConfiguration.json`" > FITConfiguration.json
+          echo "`jq --arg e "${{ vars.ACCESSKEY }}" '.situational.capella.accessKey=$e' FITConfiguration.json`" > FITConfiguration.json
+          echo "`jq --arg e "${{ vars.PRIVATEKEY }}" '.situational.capella.privateKey=$e' FITConfiguration.json`" > FITConfiguration.json
+          echo "`jq --arg e "${{ vars.PROJECTID }}" '.situational.capella.projectId=$e' FITConfiguration.json`" > FITConfiguration.json
+          echo "`jq --arg e "${{ vars.TENANTID }}" '.situational.capella.tenantId=$e' FITConfiguration.json`" > FITConfiguration.json
+          echo "`jq --arg e "${{ vars.USERNAME }}" '.situational.capella.username=$e' FITConfiguration.json`" > FITConfiguration.json
+          echo "`jq --arg e "${{ vars.PASSWORD }}" '.situational.capella.password=$e' FITConfiguration.json`" > FITConfiguration.json
+          echo "`jq --arg e "${{ vars.OVERRIDETOKEN }}" '.situational.capella.overrideToken=$e' FITConfiguration.json`" > FITConfiguration.json
+          echo "`jq --arg e "${{ vars.CLOUDPROVIDER }}" '.situational.capella.cloudProvider=$e' FITConfiguration.json`" > FITConfiguration.json
+          echo "`jq --arg e "${{ vars.REGION }}" '.situational.capella.region=$e' FITConfiguration.json`" > FITConfiguration.json
           cat FITConfiguration.json
-        env:
-          URL: ${{ vars.URL }}
       # - name: Run FIT tests
       #   run: |
       #     cd transactions-fit-performer
