@@ -48,33 +48,34 @@ jobs:
       - name: start {{ vars.PERFORMER }}  performer
         run: |
           cd jenkins-sdk
-          if [ ${{ vars.PERFORMER }} == "java" ]; then
-            ./gradlew buildPerformer --args="-d ../ -i java-performer -s java-sdk"
-            docker run --network=fit -d -p 8060:8060 java-performer
-          elif [ ${{ vars.PERFORMER }} == "scala" ]; then
-            ./gradlew buildPerformer --args="-d ../ -i scala-performer -s scala"
-            docker run --network=fit -d -p 8060:8060 scala-performer
-          elif [ ${{ vars.PERFORMER }} == "c++" ]; then
-            ./gradlew buildPerformer --args="-d ../ -i cxx-performer -s c++"
-            docker run --network=fit -d -p 8060:8060 cxx-performer
-          elif [ ${{ vars.PERFORMER }} == "dotnet" ]; then
-            ./gradlew buildPerformer --args="-d ../ -i dotnet-performer -s dotnet"
-            docker run --network=fit -d -p 8060:8060 dotnet-performer
-          elif [ ${{ vars.PERFORMER }} == "go" ]; then
-            ./gradlew buildPerformer --args="-d ../ -i go-performer -s go"
-            docker run --network=fit -d -p 8060:8060 go-performer
-          elif [ ${{ vars.PERFORMER }} == "ruby" ]; then
-            ./gradlew buildPerformer --args="-d ../ -i ruby-performer -s ruby"
-            docker run --network=fit -d -p 8060:8060 ruby-performer
-          elif [ ${{ vars.PERFORMER }} == "python" ]; then
-            ./gradlew buildPerformer --args="-d ../ -i python-performer -s python"
-            docker run --network=fit -d -p 8060:8060 python-performer
-          elif [ ${{ vars.PERFORMER }} == "node" ]; then
-            ./gradlew buildPerformer --args="-d ../ -i node-performer -s node"
-            docker run --network=fit -d -p 8060:8060 node-performer
-          else [ ${{ vars.PERFORMER }} == ""]; then
-            echo "No Performer passed"
-            exit 1
+          if [ ${{ vars.PERFORMER }} == \"java\" ]; then
+            # ./gradlew buildPerformer --args="-d ../ -i java-performer -s java-sdk"
+            # docker run --network=fit -d -p 8060:8060 java-performer
+            echo "hello"
+          # elif [ ${{ vars.PERFORMER }} == "scala" ]; then
+          #   ./gradlew buildPerformer --args="-d ../ -i scala-performer -s scala"
+          #   docker run --network=fit -d -p 8060:8060 scala-performer
+          # elif [ ${{ vars.PERFORMER }} == "c++" ]; then
+          #   ./gradlew buildPerformer --args="-d ../ -i cxx-performer -s c++"
+          #   docker run --network=fit -d -p 8060:8060 cxx-performer
+          # elif [ ${{ vars.PERFORMER }} == "dotnet" ]; then
+          #   ./gradlew buildPerformer --args="-d ../ -i dotnet-performer -s dotnet"
+          #   docker run --network=fit -d -p 8060:8060 dotnet-performer
+          # elif [ ${{ vars.PERFORMER }} == "go" ]; then
+          #   ./gradlew buildPerformer --args="-d ../ -i go-performer -s go"
+          #   docker run --network=fit -d -p 8060:8060 go-performer
+          # elif [ ${{ vars.PERFORMER }} == "ruby" ]; then
+          #   ./gradlew buildPerformer --args="-d ../ -i ruby-performer -s ruby"
+          #   docker run --network=fit -d -p 8060:8060 ruby-performer
+          # elif [ ${{ vars.PERFORMER }} == "python" ]; then
+          #   ./gradlew buildPerformer --args="-d ../ -i python-performer -s python"
+          #   docker run --network=fit -d -p 8060:8060 python-performer
+          # elif [ ${{ vars.PERFORMER }} == "node" ]; then
+          #   ./gradlew buildPerformer --args="-d ../ -i node-performer -s node"
+          #   docker run --network=fit -d -p 8060:8060 node-performer
+          # else [ ${{ vars.PERFORMER }} == ""]; then
+          #   echo "No Performer passed"
+          #   exit 1
           fi
       - name: Edit values from the FITConfiguration.json
         run: |
