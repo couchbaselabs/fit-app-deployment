@@ -48,7 +48,7 @@ jobs:
       - name: start {{ vars.PERFORMER }}  performer
         run: |
           cd jenkins-sdk
-          if [ ${{ vars.PERFORMER }} == \"java\" ]; then
+          if [ ${{ vars.PERFORMER }} == java ]; then
             ./gradlew buildPerformer --args="-d ../ -i java-performer -s java-sdk"
             docker run --network=fit -d -p 8060:8060 java-performer
           # elif [ ${{ vars.PERFORMER }} == "scala" ]; then
