@@ -44,14 +44,13 @@ jobs:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
       - name: create FIT network
         run: |
-          docker network create fit  
+          docker network create -d bridge fit 
       - name: start java performer
         run: |
           cd jenkins-sdk
           ./gradlew buildPerformer --args="-d ../ -i java-performer -s java-sdk"
-          cd ..
-          cd couchbase-jvm-clients
-          docker run --network=fit -dit --rm --expose 8060 java-performer
+          # docker run --network=fit -dit --rm --expose 8060 java-performer
+          docker run --network=fit -d -p 8060:8060 java-performer
       - name: Edit values from the FITConfiguration.json
         run: |
           cd transactions-fit-performer/test-driver
@@ -71,4 +70,5 @@ jobs:
       - name: Run FIT tests
         run: |
           cd transactions-fit-performer
-          mvn clean install -Dmaven.test.skip
+          # mvn clean install -Dmaven.test.skip
+          mvn install
