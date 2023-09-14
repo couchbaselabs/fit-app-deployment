@@ -77,7 +77,6 @@ jobs:
       - name: Run FIT tests
         run: |
           cd transactions-fit-performer
-          cd gRPC/jvm
           mvn clean install
           
           
