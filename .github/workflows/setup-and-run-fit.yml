@@ -45,7 +45,7 @@ jobs:
       - name: create FIT network
         run: |
           docker network create -d bridge fit 
-      - name: start {{ vars.PERFORMER }}  performer
+      - name: start ${{ vars.PERFORMER }}  performer
         run: |
           cd jenkins-sdk
           if [ ${{ vars.PERFORMER }} == java ]; then
@@ -72,9 +72,6 @@ jobs:
           elif [ ${{ vars.PERFORMER }} == node ]; then
             ./gradlew buildPerformer --args="-d ../ -i node-performer -s node"
             docker run --network=fit -d -p 8060:8060 node-performer
-          else [ ${{ vars.PERFORMER }} == ""]; then
-            echo "No Performer passed"
-            exit 1
           fi
       - name: Edit values from the FITConfiguration.json
         run: |
