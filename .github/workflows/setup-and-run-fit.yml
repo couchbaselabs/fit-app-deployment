@@ -71,4 +71,6 @@ jobs:
         run: |
           cd transactions-fit-performer
           # mvn clean install -Dmaven.test.skip
-          mvn install
+          # mvn install
+          ping 172.23.111.130
+          
