@@ -54,7 +54,6 @@ jobs:
       - name: Edit values from the FITConfiguration.json
         run: |
           cd transactions-fit-performer/test-driver
-          # echo "`jq '.clusterAccess.defaultHostname="172.23.111.130"' FITConfiguration.example.json`" > FITConfiguration.json
           echo "`jq --arg e "${{ vars.URL }}" '.situational.capella.url=$e' FITConfiguration.example.json`" > FITConfiguration.json
           echo "`jq --arg e "${{ vars.EXCLUDETESTS }}" '.excludeTests=[$e]' FITConfiguration.json`" > FITConfiguration.json
           echo "`jq --arg e "${{ vars.ACCESSKEY }}" '.situational.capella.accessKey=$e' FITConfiguration.json`" > FITConfiguration.json
@@ -63,9 +62,9 @@ jobs:
           echo "`jq --arg e "${{ vars.TENANTID }}" '.situational.capella.tenantId=$e' FITConfiguration.json`" > FITConfiguration.json
           echo "`jq --arg e "${{ vars.USERNAME }}" '.situational.capella.username=$e' FITConfiguration.json`" > FITConfiguration.json
           echo "`jq --arg e "${{ vars.PASSWORD }}" '.situational.capella.password=$e' FITConfiguration.json`" > FITConfiguration.json
-          echo "`jq --arg e "${{ vars.OVERRIDETOKEN }}" '.situational.capella.overrideToken=$e' FITConfiguration.json`" > FITConfiguration.json
-          echo "`jq --arg e "${{ vars.CLOUDPROVIDER }}" '.situational.capella.cloudProvider=$e' FITConfiguration.json`" > FITConfiguration.json
-          echo "`jq --arg e "${{ vars.REGION }}" '.situational.capella.region=$e' FITConfiguration.json`" > FITConfiguration.json
+          echo "`jq 'del(.situational.capella.overrideToken)' FITConfiguration.json`" > FITConfiguration.json
+          echo "`jq 'del(.situational.capella.cloudProvider)' FITConfiguration.json`" > FITConfiguration.json
+          echo "`jq 'del(.situational.capella.region)' FITConfiguration.json`" > FITConfiguration.json
           cat FITConfiguration.json
       - name: Create postgres perf db
         run: |
@@ -75,10 +74,10 @@ jobs:
           docker exec timedb psql -U postgres -c "CREATE DATABASE perf;"
           cd jenkins-sdk
           ./gradlew setupPerfDatabase
-          # mvn install
       - name: Run FIT tests
         run: |
           cd transactions-fit-performer
-          mvn clean install -Dmaven.test.skip
+          cd gRPC/jvm
+          mvn clean install
           
           
