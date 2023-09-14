@@ -1,5 +1,5 @@
-name: Run FIT Tests
-run-name: ${{ github.actor }} Running FIT tests on cbdinoclusters
+name: Run SIT Tests
+run-name: ${{ github.actor }} Run SIT tests
 on: [push]
 jobs:
   build:
@@ -39,7 +39,6 @@ jobs:
       - name: clone jenkins sdk repo
         run: |
           git clone git@github.com:couchbaselabs/jenkins-sdk.git
-          cd jenkins-sdk
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
       - name: create FIT network
@@ -88,17 +87,17 @@ jobs:
           echo "`jq 'del(.situational.capella.cloudProvider)' FITConfiguration.json`" > FITConfiguration.json
           echo "`jq 'del(.situational.capella.region)' FITConfiguration.json`" > FITConfiguration.json
           cat FITConfiguration.json
-      # - name: Create postgres perf db
-      #   run: |
-      #     docker network create -d bridge perf 
-      #     docker run -d --restart=always -p 5432:5432 -e POSTGRES_PASSWORD=password --network perf --name timedb timescale/timescaledb:latest-pg14
-      #     sleep 10;
-      #     docker exec timedb psql -U postgres -c "CREATE DATABASE perf;"
-      #     cd jenkins-sdk
-      #     ./gradlew setupPerfDatabase
-      # - name: Run FIT tests
-      #   run: |
-      #     cd transactions-fit-performer
-      #     mvn clean install
+      - name: Create postgres perf db
+        run: |
+          docker network create -d bridge perf 
+          docker run -d --restart=always -p 5432:5432 -e POSTGRES_PASSWORD=password --network perf --name timedb timescale/timescaledb:latest-pg14
+          sleep 10;
+          docker exec timedb psql -U postgres -c "CREATE DATABASE perf;"
+          cd jenkins-sdk
+          ./gradlew setupPerfDatabase
+      - name: Run SIT tests
+        run: |
+          cd transactions-fit-performer
+          mvn clean install
           
           
