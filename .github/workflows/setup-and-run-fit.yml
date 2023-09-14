@@ -75,6 +75,7 @@ jobs:
           else [ ${{ vars.PERFORMER }} == ""]; then
             echo "No Performer passed"
             exit 1
+          fi
       - name: Edit values from the FITConfiguration.json
         run: |
           cd transactions-fit-performer/test-driver
