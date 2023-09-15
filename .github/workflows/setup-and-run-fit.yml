@@ -69,7 +69,7 @@ jobs:
           docker network create -d bridge perf 
           docker run -d --restart=always -p 5432:5432 -e POSTGRES_PASSWORD=password --network perf --name timedb timescale/timescaledb:latest-pg14
           sleep 10
-          pg_isready -d perf -p 5432
+          pg_isready -d timedb -p 5432
           docker exec timedb psql -U postgres -c "CREATE DATABASE perf;" 
           # pg_isready -d perf -p 5432
           # cd jenkins-sdk
