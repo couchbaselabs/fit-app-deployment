@@ -17,58 +17,59 @@ jobs:
           server-id: ossrh
           server-username: MAVEN_USERNAME
           server-password: MAVEN_PASSWORD
-      - name: Setup SSH
-        uses: MrSquaare/ssh-setup-action@v1
-        with:
-            host: github.com
-            private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-      - name: clone and setup couchbase jvm client 
-        run: |
-          git clone git@github.com:couchbase/couchbase-jvm-clients.git
-          cd couchbase-jvm-clients
-          # make
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-      - name: clone and setup fit
-        run: |
-          git clone git@github.com:couchbaselabs/transactions-fit-performer.git
-          cd transactions-fit-performer
-          docker build --no-cache -f test-driver/Dockerfile -t fit/test-driver:latest .
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-      - name: clone jenkins sdk repo
-        run: |
-          git clone git@github.com:couchbaselabs/jenkins-sdk.git
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-      - name: create FIT network
-        run: |
-          docker network create -d bridge fit 
-      - name: start ${{ vars.PERFORMER }}  performer
-        run: |
-          cd jenkins-sdk
-          ./gradlew buildPerformer --args="-d ../ -i ${{ vars.PERFORMER }}-performer -s ${{ vars.PERFORMER }}"
-          docker run --network=fit -d -p 8060:8060 ${{ vars.PERFORMER }}-performer
-      - name: Edit values from the FITConfiguration.json
-        run: |
-          cd transactions-fit-performer/test-driver
-          echo "`jq --arg e "${{ vars.URL }}" '.situational.capella.url=$e' FITConfiguration.example.json`" > FITConfiguration.json
-          echo "`jq --arg e "${{ vars.EXCLUDETESTS }}" '.excludeTests=[$e]' FITConfiguration.json`" > FITConfiguration.json
-          echo "`jq --arg e "${{ vars.ACCESSKEY }}" '.situational.capella.accessKey=$e' FITConfiguration.json`" > FITConfiguration.json
-          echo "`jq --arg e "${{ vars.PRIVATEKEY }}" '.situational.capella.privateKey=$e' FITConfiguration.json`" > FITConfiguration.json
-          echo "`jq --arg e "${{ vars.PROJECTID }}" '.situational.capella.projectId=$e' FITConfiguration.json`" > FITConfiguration.json
-          echo "`jq --arg e "${{ vars.TENANTID }}" '.situational.capella.tenantId=$e' FITConfiguration.json`" > FITConfiguration.json
-          echo "`jq --arg e "${{ vars.USERNAME }}" '.situational.capella.username=$e' FITConfiguration.json`" > FITConfiguration.json
-          echo "`jq --arg e "${{ vars.PASSWORD }}" '.situational.capella.password=$e' FITConfiguration.json`" > FITConfiguration.json
-          echo "`jq 'del(.situational.capella.overrideToken)' FITConfiguration.json`" > FITConfiguration.json
-          echo "`jq 'del(.situational.capella.cloudProvider)' FITConfiguration.json`" > FITConfiguration.json
-          echo "`jq 'del(.situational.capella.region)' FITConfiguration.json`" > FITConfiguration.json
-          cat FITConfiguration.json
+      # - name: Setup SSH
+      #   uses: MrSquaare/ssh-setup-action@v1
+      #   with:
+      #       host: github.com
+      #       private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+      # - name: clone and setup couchbase jvm client 
+      #   run: |
+      #     git clone git@github.com:couchbase/couchbase-jvm-clients.git
+      #     cd couchbase-jvm-clients
+      #     # make
+      #   env:
+      #     SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+      # - name: clone and setup fit
+      #   run: |
+      #     git clone git@github.com:couchbaselabs/transactions-fit-performer.git
+      #     cd transactions-fit-performer
+      #     docker build --no-cache -f test-driver/Dockerfile -t fit/test-driver:latest .
+      #   env:
+      #     SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+      # - name: clone jenkins sdk repo
+      #   run: |
+      #     git clone git@github.com:couchbaselabs/jenkins-sdk.git
+      #   env:
+      #     SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+      # - name: create FIT network
+      #   run: |
+      #     docker network create -d bridge fit 
+      # - name: start ${{ vars.PERFORMER }}  performer
+      #   run: |
+      #     cd jenkins-sdk
+      #     ./gradlew buildPerformer --args="-d ../ -i ${{ vars.PERFORMER }}-performer -s ${{ vars.PERFORMER }}"
+      #     docker run --network=fit -d -p 8060:8060 ${{ vars.PERFORMER }}-performer
+      # - name: Edit values from the FITConfiguration.json
+      #   run: |
+      #     cd transactions-fit-performer/test-driver
+      #     echo "`jq --arg e "${{ vars.URL }}" '.situational.capella.url=$e' FITConfiguration.example.json`" > FITConfiguration.json
+      #     echo "`jq --arg e "${{ vars.EXCLUDETESTS }}" '.excludeTests=[$e]' FITConfiguration.json`" > FITConfiguration.json
+      #     echo "`jq --arg e "${{ vars.ACCESSKEY }}" '.situational.capella.accessKey=$e' FITConfiguration.json`" > FITConfiguration.json
+      #     echo "`jq --arg e "${{ vars.PRIVATEKEY }}" '.situational.capella.privateKey=$e' FITConfiguration.json`" > FITConfiguration.json
+      #     echo "`jq --arg e "${{ vars.PROJECTID }}" '.situational.capella.projectId=$e' FITConfiguration.json`" > FITConfiguration.json
+      #     echo "`jq --arg e "${{ vars.TENANTID }}" '.situational.capella.tenantId=$e' FITConfiguration.json`" > FITConfiguration.json
+      #     echo "`jq --arg e "${{ vars.USERNAME }}" '.situational.capella.username=$e' FITConfiguration.json`" > FITConfiguration.json
+      #     echo "`jq --arg e "${{ vars.PASSWORD }}" '.situational.capella.password=$e' FITConfiguration.json`" > FITConfiguration.json
+      #     echo "`jq 'del(.situational.capella.overrideToken)' FITConfiguration.json`" > FITConfiguration.json
+      #     echo "`jq 'del(.situational.capella.cloudProvider)' FITConfiguration.json`" > FITConfiguration.json
+      #     echo "`jq 'del(.situational.capella.region)' FITConfiguration.json`" > FITConfiguration.json
+      #     cat FITConfiguration.json
       - name: Create postgres perf db
         run: |
           docker network create -d bridge perf 
           docker run -d --restart=always -p 5432:5432 -e POSTGRES_PASSWORD=password --network perf --name timedb timescale/timescaledb:latest-pg14
-          sleep 10;
+          sleep 10
+          pg_isready -d perf -p 5432
           docker exec timedb psql -U postgres -c "CREATE DATABASE perf;" 
           # pg_isready -d perf -p 5432
           # cd jenkins-sdk
