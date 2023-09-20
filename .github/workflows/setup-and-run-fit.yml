@@ -77,7 +77,7 @@ jobs:
           ./gradlew setupPerfDatabase
       - name: Generate the gRPC
         run: |
-          cd gRPC/jvm
+          cd transactions-fit-performer/gRPC/jvm
           mvn clean install  
       - name: Run SIT tests
         run: |
