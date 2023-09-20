@@ -82,5 +82,5 @@ jobs:
       - name: Run SIT tests
         run: |
           cd transactions-fit-performer
-          mvn clean install -Dmaven.test.skip
-          mvn --projects test-driver --also-make -Dmaven.test.failure.ignore -DfailIfNoTests=false test Dgroups=situational,capella -DexcludedGroups=openshift
+          # mvn clean install -Dmaven.test.skip
+          mvn --projects test-driver --also-make -Dmaven.test.failure.ignore -DfailIfNoTests=false test -Dgroups=situational,capella -DexcludedGroups=openshift
