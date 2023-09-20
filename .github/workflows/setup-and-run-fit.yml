@@ -75,7 +75,11 @@ jobs:
           docker exec timedb psql -U postgres -c "CREATE DATABASE perf;" 
           cd jenkins-sdk
           ./gradlew setupPerfDatabase
+      - name: Generate the gRPC
+        run: |
+          cd gRPC/jvm
+          mvn clean install  
       - name: Run SIT tests
         run: |
           cd transactions-fit-performer
-          mvn clean install  
+          mvn --projects test-driver --also-make -Dmaven.test.failure.ignore -DfailIfNoTests=false test Dgroups=situational,capella -DexcludedGroups=openshift
