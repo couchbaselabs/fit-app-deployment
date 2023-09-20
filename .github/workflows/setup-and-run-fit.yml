@@ -59,22 +59,13 @@ jobs:
           echo "`jq --arg e "${{ vars.TENANTID }}" '.situational.capella.tenantId=$e' FITConfiguration.json`" > FITConfiguration.json
           echo "`jq --arg e "${{ vars.USERNAME }}" '.situational.capella.username=$e' FITConfiguration.json`" > FITConfiguration.json
           echo "`jq --arg e "${{ vars.PASSWORD }}" '.situational.capella.password=$e' FITConfiguration.json`" > FITConfiguration.json
+          echo "`jq --arg e "${{ vars.PGHOST }}" '.situational.database.jdbc=$e' FITConfiguration.json`" > FITConfiguration.json
+          echo "`jq --arg e "${{ vars.PGUSERNAME }}" '.situational.database.username=$e' FITConfiguration.json`" > FITConfiguration.json
+          echo "`jq --arg e "${{ vars.PGPASSWORD }}" '.situational.database.password=$e' FITConfiguration.json`" > FITConfiguration.json
           echo "`jq 'del(.situational.capella.overrideToken)' FITConfiguration.json`" > FITConfiguration.json
           echo "`jq 'del(.situational.capella.cloudProvider)' FITConfiguration.json`" > FITConfiguration.json
           echo "`jq 'del(.situational.capella.region)' FITConfiguration.json`" > FITConfiguration.json
           cat FITConfiguration.json
-      - name: Create postgres perf db
-        run: |
-          docker network create -d bridge perf 
-          docker run -d --restart=always -p 5432:5432 -e POSTGRES_PASSWORD=password --network perf --name timedb timescale/timescaledb:latest-pg14
-          until docker exec timedb pg_isready -U postgres -h localhost -p 5432
-            do
-              echo "Waiting for PostgreSQL connection..."
-              sleep 1
-            done
-          docker exec timedb psql -U postgres -c "CREATE DATABASE perf;" 
-          cd jenkins-sdk
-          ./gradlew setupPerfDatabase
       - name: Generate the gRPC
         run: |
           cd transactions-fit-performer/gRPC/jvm
@@ -82,5 +73,4 @@ jobs:
       - name: Run SIT tests
         run: |
           cd transactions-fit-performer
-          # mvn clean install -Dmaven.test.skip
           mvn --projects test-driver --also-make -Dmaven.test.failure.ignore -DfailIfNoTests=false test -Dgroups=situational,capella -DexcludedGroups=openshift
