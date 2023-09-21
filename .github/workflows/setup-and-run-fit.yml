@@ -1,0 +1,76 @@
+name: Run SIT Tests
+run-name: ${{ github.actor }} Run SIT tests
+on: [push]
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    environment:
+      name: env
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Maven Central Repository
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          server-id: ossrh
+          server-username: MAVEN_USERNAME
+          server-password: MAVEN_PASSWORD
+      - name: Setup SSH
+        uses: MrSquaare/ssh-setup-action@v1
+        with:
+            host: github.com
+            private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+      - name: clone and setup couchbase jvm client 
+        run: |
+          git clone git@github.com:couchbase/couchbase-jvm-clients.git
+          cd couchbase-jvm-clients
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+      - name: clone and setup fit
+        run: |
+          git clone git@github.com:couchbaselabs/transactions-fit-performer.git
+          cd transactions-fit-performer
+          docker build --no-cache -f test-driver/Dockerfile -t fit/test-driver:latest .
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+      - name: clone jenkins sdk repo
+        run: |
+          git clone git@github.com:couchbaselabs/jenkins-sdk.git
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+      - name: create FIT network
+        run: |
+          docker network create -d bridge fit 
+      - name: start ${{ vars.PERFORMER }}  performer
+        run: |
+          cd jenkins-sdk
+          ./gradlew buildPerformer --args="-d ../ -i ${{ vars.PERFORMER }}-performer -s ${{ vars.PERFORMER }}"
+          docker run --network=fit -d -p 8060:8060 ${{ vars.PERFORMER }}-performer
+      - name: Edit values from the FITConfiguration.json
+        run: |
+          cd transactions-fit-performer/test-driver
+          echo "`jq --arg e "${{ vars.URL }}" '.situational.capella.url=$e' FITConfiguration.example.json`" > FITConfiguration.json
+          echo "`jq --arg e "${{ vars.EXCLUDETESTS }}" '.excludeTests=[$e]' FITConfiguration.json`" > FITConfiguration.json
+          echo "`jq --arg e "${{ vars.ACCESSKEY }}" '.situational.capella.accessKey=$e' FITConfiguration.json`" > FITConfiguration.json
+          echo "`jq --arg e "${{ vars.PRIVATEKEY }}" '.situational.capella.privateKey=$e' FITConfiguration.json`" > FITConfiguration.json
+          echo "`jq --arg e "${{ vars.PROJECTID }}" '.situational.capella.projectId=$e' FITConfiguration.json`" > FITConfiguration.json
+          echo "`jq --arg e "${{ vars.TENANTID }}" '.situational.capella.tenantId=$e' FITConfiguration.json`" > FITConfiguration.json
+          echo "`jq --arg e "${{ vars.USERNAME }}" '.situational.capella.username=$e' FITConfiguration.json`" > FITConfiguration.json
+          echo "`jq --arg e "${{ vars.PASSWORD }}" '.situational.capella.password=$e' FITConfiguration.json`" > FITConfiguration.json
+          echo "`jq --arg e "${{ vars.PGHOST }}" '.situational.database.jdbc=$e' FITConfiguration.json`" > FITConfiguration.json
+          echo "`jq --arg e "${{ vars.PGUSERNAME }}" '.situational.database.username=$e' FITConfiguration.json`" > FITConfiguration.json
+          echo "`jq --arg e "${{ vars.PGPASSWORD }}" '.situational.database.password=$e' FITConfiguration.json`" > FITConfiguration.json
+          echo "`jq 'del(.situational.capella.overrideToken)' FITConfiguration.json`" > FITConfiguration.json
+          echo "`jq 'del(.situational.capella.cloudProvider)' FITConfiguration.json`" > FITConfiguration.json
+          echo "`jq 'del(.situational.capella.region)' FITConfiguration.json`" > FITConfiguration.json
+          cat FITConfiguration.json
+      - name: Generate the gRPC
+        run: |
+          cd transactions-fit-performer/gRPC/jvm
+          mvn clean install  
+      - name: Run SIT tests
+        run: |
+          cd transactions-fit-performer
+          mvn --projects test-driver --also-make -Dmaven.test.failure.ignore -DfailIfNoTests=false test -Dgroups=situational,capella -DexcludedGroups=openshift
