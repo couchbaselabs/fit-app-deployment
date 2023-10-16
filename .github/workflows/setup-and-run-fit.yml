@@ -36,7 +36,7 @@ jobs:
           cd transactions-fit-performer
           docker build --no-cache -f test-driver/Dockerfile -t fit/test-driver:latest .
         env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_GERRIT_PRIVATE_KEY }}
       - name: clone jenkins sdk repo
         run: |
           git clone git@github.com:couchbaselabs/jenkins-sdk.git
