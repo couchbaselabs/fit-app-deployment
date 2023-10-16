@@ -32,8 +32,8 @@ jobs:
         run: |
           git clone git@github.com:couchbaselabs/transactions-fit-performer.git
           # cherry-pick
-          git fetch ssh://littlefermatlives@review.couchbase.org:29418/transactions-fit-performer refs/changes/02/197302/36 && git cherry-pick FETCH_HEAD
           cd transactions-fit-performer
+          git fetch ssh://littlefermatlives@review.couchbase.org:29418/transactions-fit-performer refs/changes/02/197302/36 && git cherry-pick FETCH_HEAD
           docker build --no-cache -f test-driver/Dockerfile -t fit/test-driver:latest .
         env:
           SSH_PRIVATE_KEY: ${{ secrets.COUCH_SSH_PRIVATE_KEY }}
