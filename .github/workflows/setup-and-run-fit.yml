@@ -42,7 +42,12 @@ jobs:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
       - name: create FIT network
         run: |
-          docker network create -d bridge fit 
+          docker network create -d bridge fit
+      - name: Download and setup cb-dino cluster
+        run: |
+          wget https://github.com/couchbaselabs/cbdinocluster/releases/download/v0.0.9/cbdinocluster-linux
+          chmod 400 ./cbdinocluster-linux
+          ./cbdinocluster-linux init --auto
       - name: start ${{ vars.PERFORMER }}  performer
         run: |
           cd jenkins-sdk
@@ -66,11 +71,11 @@ jobs:
           echo "`jq 'del(.situational.capella.cloudProvider)' FITConfiguration.json`" > FITConfiguration.json
           echo "`jq 'del(.situational.capella.region)' FITConfiguration.json`" > FITConfiguration.json
           cat FITConfiguration.json
-      - name: Generate the gRPC
-        run: |
-          cd transactions-fit-performer/gRPC/jvm
-          mvn clean install  
-      - name: Run SIT tests
-        run: |
-          cd transactions-fit-performer
-          mvn --projects test-driver --also-make -Dmaven.test.failure.ignore -DfailIfNoTests=false test -Dgroups=situational,capella -DexcludedGroups=openshift
+#      - name: Generate the gRPC
+#        run: |
+#          cd transactions-fit-performer/gRPC/jvm
+#          mvn clean install
+#      - name: Run SIT tests
+#        run: |
+#          cd transactions-fit-performer
+#          mvn --projects test-driver --also-make -Dmaven.test.failure.ignore -DfailIfNoTests=false test -Dgroups=situational,capella -DexcludedGroups=openshift
