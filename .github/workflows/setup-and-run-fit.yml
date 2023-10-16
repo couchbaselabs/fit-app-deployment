@@ -49,6 +49,7 @@ jobs:
           wget https://github.com/couchbaselabs/cbdinocluster/releases/download/v0.0.9/cbdinocluster-linux
           chmod 744 ./cbdinocluster-linux
           echo "N" | ./cbdinocluster-linux init --aws-region ${{ vars.AWS_REGION }} --capella-aws-region ${{ vars.CAP_AWS_REGION }} --capella-endpoint ${{ vars.CAP_END_POINT }} --capella-oid ${{ vars.CAP_OID }} --capella-user ${{ vars.CAP_USER }} --capella-pass ${{ vars.CAP_PASS }} --disable-docker true
+          echo "`jq --arg e "cloud" '.excludeTests=$e' ~/.cbdinocluster`" > ~/.cbdinocluster
           ./cbdinocluster-linux allocate simple:7.2.0
       # - name: start ${{ vars.PERFORMER }}  performer
       #   run: |
