@@ -30,6 +30,8 @@ jobs:
           SSH_PRIVATE_KEY: ${{ secrets.RSA_SSH_PVT_KEY }}
       - name: clone and setup fit
         run: |
+          git config --global user.email "saurabh.mishra@couchbase.com"
+          git config --global user.name "littlefermatlives"
           git clone "https://review.couchbase.org/transactions-fit-performer"
           # cherry-pick
           cd transactions-fit-performer
