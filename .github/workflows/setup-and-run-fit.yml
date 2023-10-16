@@ -57,34 +57,34 @@ jobs:
           cat ~/.cbdinocluster
           # sudo systemctl start docker.socket
           # ./cbdinocluster-linux allocate simple:7.2.0
-      # - name: start ${{ vars.PERFORMER }}  performer
-      #   run: |
-      #     cd jenkins-sdk
-      #     ./gradlew buildPerformer --args="-d ../ -i ${{ vars.PERFORMER }}-performer -s ${{ vars.PERFORMER }}"
-      #     docker run --network=fit -d -p 8060:8060 ${{ vars.PERFORMER }}-performer
-      - name: Edit values from the FITConfiguration.json
+      - name: start ${{ vars.PERFORMER }}  performer
         run: |
-          cd transactions-fit-performer/test-driver
-          echo "`jq --arg e "${{ vars.URL }}" '.situational.capella.url=$e' FITConfiguration.example.json`" > FITConfiguration.json
-          echo "`jq --arg e "${{ vars.EXCLUDETESTS }}" '.excludeTests=[$e]' FITConfiguration.json`" > FITConfiguration.json
-          echo "`jq --arg e "${{ vars.ACCESSKEY }}" '.situational.capella.accessKey=$e' FITConfiguration.json`" > FITConfiguration.json
-          echo "`jq --arg e "${{ vars.PRIVATEKEY }}" '.situational.capella.privateKey=$e' FITConfiguration.json`" > FITConfiguration.json
-          echo "`jq --arg e "${{ vars.PROJECTID }}" '.situational.capella.projectId=$e' FITConfiguration.json`" > FITConfiguration.json
-          echo "`jq --arg e "${{ vars.TENANTID }}" '.situational.capella.tenantId=$e' FITConfiguration.json`" > FITConfiguration.json
-          echo "`jq --arg e "${{ vars.USERNAME }}" '.situational.capella.username=$e' FITConfiguration.json`" > FITConfiguration.json
-          echo "`jq --arg e "${{ vars.PASSWORD }}" '.situational.capella.password=$e' FITConfiguration.json`" > FITConfiguration.json
-          echo "`jq --arg e "${{ vars.PGHOST }}" '.situational.database.jdbc=$e' FITConfiguration.json`" > FITConfiguration.json
-          echo "`jq --arg e "${{ vars.PGUSERNAME }}" '.situational.database.username=$e' FITConfiguration.json`" > FITConfiguration.json
-          echo "`jq --arg e "${{ vars.PGPASSWORD }}" '.situational.database.password=$e' FITConfiguration.json`" > FITConfiguration.json
-          echo "`jq 'del(.situational.capella.overrideToken)' FITConfiguration.json`" > FITConfiguration.json
-          echo "`jq 'del(.situational.capella.cloudProvider)' FITConfiguration.json`" > FITConfiguration.json
-          echo "`jq 'del(.situational.capella.region)' FITConfiguration.json`" > FITConfiguration.json
-          cat FITConfiguration.json
-#      - name: Generate the gRPC
-#        run: |
-#          cd transactions-fit-performer/gRPC/jvm
-#          mvn clean install
-#      - name: Run SIT tests
-#        run: |
-#          cd transactions-fit-performer
-#          mvn --projects test-driver --also-make -Dmaven.test.failure.ignore -DfailIfNoTests=false test -Dgroups=situational,capella -DexcludedGroups=openshift
+          cd jenkins-sdk
+          ./gradlew buildPerformer --args="-d ../ -i ${{ vars.PERFORMER }}-performer -s ${{ vars.PERFORMER }}"
+          docker run --network=fit -d -p 8060:8060 ${{ vars.PERFORMER }}-performer
+      # - name: Edit values from the FITConfiguration.json
+      #   run: |
+      #     cd transactions-fit-performer/test-driver
+      #     echo "`jq --arg e "${{ vars.URL }}" '.situational.capella.url=$e' FITConfiguration.example.json`" > FITConfiguration.json
+      #     echo "`jq --arg e "${{ vars.EXCLUDETESTS }}" '.excludeTests=[$e]' FITConfiguration.json`" > FITConfiguration.json
+      #     echo "`jq --arg e "${{ vars.ACCESSKEY }}" '.situational.capella.accessKey=$e' FITConfiguration.json`" > FITConfiguration.json
+      #     echo "`jq --arg e "${{ vars.PRIVATEKEY }}" '.situational.capella.privateKey=$e' FITConfiguration.json`" > FITConfiguration.json
+      #     echo "`jq --arg e "${{ vars.PROJECTID }}" '.situational.capella.projectId=$e' FITConfiguration.json`" > FITConfiguration.json
+      #     echo "`jq --arg e "${{ vars.TENANTID }}" '.situational.capella.tenantId=$e' FITConfiguration.json`" > FITConfiguration.json
+      #     echo "`jq --arg e "${{ vars.USERNAME }}" '.situational.capella.username=$e' FITConfiguration.json`" > FITConfiguration.json
+      #     echo "`jq --arg e "${{ vars.PASSWORD }}" '.situational.capella.password=$e' FITConfiguration.json`" > FITConfiguration.json
+      #     echo "`jq --arg e "${{ vars.PGHOST }}" '.situational.database.jdbc=$e' FITConfiguration.json`" > FITConfiguration.json
+      #     echo "`jq --arg e "${{ vars.PGUSERNAME }}" '.situational.database.username=$e' FITConfiguration.json`" > FITConfiguration.json
+      #     echo "`jq --arg e "${{ vars.PGPASSWORD }}" '.situational.database.password=$e' FITConfiguration.json`" > FITConfiguration.json
+      #     echo "`jq 'del(.situational.capella.overrideToken)' FITConfiguration.json`" > FITConfiguration.json
+      #     echo "`jq 'del(.situational.capella.cloudProvider)' FITConfiguration.json`" > FITConfiguration.json
+      #     echo "`jq 'del(.situational.capella.region)' FITConfiguration.json`" > FITConfiguration.json
+      #     cat FITConfiguration.json
+      - name: Generate the gRPC
+        run: |
+         cd transactions-fit-performer/gRPC/jvm
+         mvn clean install
+      - name: Run SIT tests
+        run: |
+         cd transactions-fit-performer
+         mvn --projects test-driver --also-make -Dmaven.test.failure.ignore -DfailIfNoTests=false test -Dgroups=situational,cbDino -DexcludedGroups=openshift,capella
