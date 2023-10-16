@@ -31,8 +31,6 @@ jobs:
       - name: clone and setup fit
         run: |
           git clone git@github.com:couchbaselabs/transactions-fit-performer.git
-          # cherry-pick
-          git fetch ssh://littlefermatlives@review.couchbase.org:29418/transactions-fit-performer refs/changes/02/197302/36 && git cherry-pick FETCH_HEAD
           cd transactions-fit-performer
           docker build --no-cache -f test-driver/Dockerfile -t fit/test-driver:latest .
         env:
@@ -51,12 +49,8 @@ jobs:
           chmod 744 ./cbdinocluster-linux
       - name: init cbdino cluster
         run: |
-          # sudo systemctl stop docker.socket
-          echo -e "n\nn\nn\nY\nn" | ./cbdinocluster-linux init --aws-region ${{ vars.AWS_REGION }} --capella-aws-region ${{ vars.CAP_AWS_REGION }} --capella-endpoint ${{ vars.CAP_END_POINT }} --capella-oid ${{ vars.CAP_OID }} --capella-user ${{ vars.CAP_USER }} --capella-pass ${{ vars.CAP_PASS }} --disable-docker "true"
-          # ./cbdinocluster-linux allocate simple:7.2.0
+          echo -e "n\nn\nn\nY\nn" | ./cbdinocluster-linux init --aws-region ${{ vars.AWS_REGION }} --capella-aws-region ${{ vars.CAP_AWS_REGION }} --capella-endpoint ${{ vars.CAP_END_POINT }} --capella-oid ${{ vars.CAP_OID }} --capella-user ${{ vars.CAP_USER }} --capella-pass ${{ vars.CAP_PASS }}
           cat ~/.cbdinocluster
-          # sudo systemctl start docker.socket
-          # ./cbdinocluster-linux allocate simple:7.2.0
       - name: start ${{ vars.PERFORMER }}  performer
         run: |
           cd jenkins-sdk
@@ -66,18 +60,14 @@ jobs:
         run: |
           cd transactions-fit-performer/test-driver
           echo "`jq --arg e "${{ vars.EXCLUDETESTS }}" '.excludeTests=[$e]' FITConfiguration.example.json`" > FITConfiguration.json
-          # echo "`jq --arg e "${{ vars.URL }}" '.situational.capella.url=$e' FITConfiguration.example.json`" > FITConfiguration.json
           echo "`jq --arg e "${{ vars.SERVER_VERSION }}" '.situational.cbdino.version=$e' FITConfiguration.json`" > FITConfiguration.json
           echo "`jq --arg e "${{ vars.DEPLOYER }}" '.situational.cbdino.deployer=$e' FITConfiguration.json`" > FITConfiguration.json
           echo "`jq --arg e "${{ vars.REGION }}" '.situational.cbdino.region=$e' FITConfiguration.json`" > FITConfiguration.json
           echo "`jq --arg e "${{ vars.CBDINO_PATH }}" '.situational.cbdino.cbDinoClusterAppPath=$e' FITConfiguration.json`" > FITConfiguration.json
           echo "`jq --arg e "${{ vars.ENABLE_PE }}" '.situational.cbdino.enablePrivateEndpoint=$e' FITConfiguration.json`" > FITConfiguration.json
-          # echo "`jq --arg e "${{ vars.PASSWORD }}" '.situational.capella.password=$e' FITConfiguration.json`" > FITConfiguration.json
           echo "`jq --arg e "${{ vars.PGHOST }}" '.situational.database.jdbc=$e' FITConfiguration.json`" > FITConfiguration.json
           echo "`jq --arg e "${{ vars.PGUSERNAME }}" '.situational.database.username=$e' FITConfiguration.json`" > FITConfiguration.json
           echo "`jq --arg e "${{ vars.PGPASSWORD }}" '.situational.database.password=$e' FITConfiguration.json`" > FITConfiguration.json
-          # echo "`jq 'del(.situational.capella.overrideToken)' FITConfiguration.json`" > FITConfiguration.json
-          # echo "`jq 'del(.situational.capella.cloudProvider)' FITConfiguration.json`" > FITConfiguration.json
           echo "`jq 'del(.situational.cbdino.enablePrivateEndpoint)' FITConfiguration.json`" > FITConfiguration.json
           cat FITConfiguration.json
       - name: Generate the gRPC
