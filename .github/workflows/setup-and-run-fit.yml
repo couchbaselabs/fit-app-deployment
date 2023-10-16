@@ -50,15 +50,13 @@ jobs:
           # rm -rf ~/.cbdinocluster
           # find -L . -name "foo*"
           chmod 744 ./cbdinocluster-linux
-          echo "n" | ./cbdinocluster-linux init --aws-region ${{ vars.AWS_REGION }} --capella-aws-region ${{ vars.CAP_AWS_REGION }} --capella-endpoint ${{ vars.CAP_END_POINT }} --capella-oid ${{ vars.CAP_OID }} --capella-user ${{ vars.CAP_USER }} --capella-pass ${{ vars.CAP_PASS }} --disable-docker "true"
-          ./cbdinocluster-linux allocate simple:7.2.0
-          cat ~/.cbdinocluster
       - name: init cbdino cluster
         run: |
-          lp ./cbdinocluster-linux init --aws-region ${{ vars.AWS_REGION }} --capella-aws-region ${{ vars.CAP_AWS_REGION }} --capella-endpoint ${{ vars.CAP_END_POINT }} --capella-oid ${{ vars.CAP_OID }} --capella-user ${{ vars.CAP_USER }} --capella-pass ${{ vars.CAP_PASS }} --disable-docker "true"
+          sudo systemctl docker stop
           echo "n" | ./cbdinocluster-linux init --aws-region ${{ vars.AWS_REGION }} --capella-aws-region ${{ vars.CAP_AWS_REGION }} --capella-endpoint ${{ vars.CAP_END_POINT }} --capella-oid ${{ vars.CAP_OID }} --capella-user ${{ vars.CAP_USER }} --capella-pass ${{ vars.CAP_PASS }} --disable-docker "true"
-          ./cbdinocluster-linux allocate simple:7.2.0
+          # ./cbdinocluster-linux allocate simple:7.2.0
           cat ~/.cbdinocluster
+          sudo systemctl docker start 
       # - name: start ${{ vars.PERFORMER }}  performer
       #   run: |
       #     cd jenkins-sdk
