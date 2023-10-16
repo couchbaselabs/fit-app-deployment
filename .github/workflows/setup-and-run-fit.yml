@@ -21,13 +21,13 @@ jobs:
         uses: MrSquaare/ssh-setup-action@v1
         with:
             host: github.com
-            private-key: ${{ secrets.SSH_GERRIT_PRIVATE_KEY }}
+            private-key: ${{ secrets.COUCH_SSH_PRIVATE_KEY }}
       - name: clone and setup couchbase jvm client 
         run: |
           git clone git@github.com:couchbase/couchbase-jvm-clients.git
           cd couchbase-jvm-clients
         env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_GERRIT_PRIVATE_KEY }}
+          SSH_PRIVATE_KEY: ${{ secrets.COUCH_SSH_PRIVATE_KEY }}
       - name: clone and setup fit
         run: |
           git clone git@github.com:couchbaselabs/transactions-fit-performer.git
@@ -36,12 +36,12 @@ jobs:
           cd transactions-fit-performer
           docker build --no-cache -f test-driver/Dockerfile -t fit/test-driver:latest .
         env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_GERRIT_PRIVATE_KEY }}
+          SSH_PRIVATE_KEY: ${{ secrets.COUCH_SSH_PRIVATE_KEY }}
       - name: clone jenkins sdk repo
         run: |
           git clone git@github.com:couchbaselabs/jenkins-sdk.git
         env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_GERRIT_PRIVATE_KEY }}
+          SSH_PRIVATE_KEY: ${{ secrets.COUCH_SSH_PRIVATE_KEY }}
       - name: create FIT network
         run: |
           docker network create -d bridge fit
