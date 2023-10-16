@@ -24,37 +24,39 @@ jobs:
             private-key: ${{ secrets.COUCH_SSH_PRIVATE_KEY }}
       - name: clone and setup couchbase jvm client 
         run: |
+          cd ~/.ssh
+          ls
           git clone git@github.com:couchbase/couchbase-jvm-clients.git
           cd couchbase-jvm-clients
         env:
           SSH_PRIVATE_KEY: ${{ secrets.COUCH_SSH_PRIVATE_KEY }}
-      - name: clone and setup fit
-        run: |
-          git clone git@github.com:couchbaselabs/transactions-fit-performer.git
-          # cherry-pick
-          cd transactions-fit-performer
-          git fetch ssh://littlefermatlives@review.couchbase.org:29418/transactions-fit-performer refs/changes/02/197302/36 && git checkout FETCH_HEAD
-          docker build --no-cache -f test-driver/Dockerfile -t fit/test-driver:latest .
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.COUCH_SSH_PRIVATE_KEY }}
-      - name: clone jenkins sdk repo
-        run: |
-          git clone git@github.com:couchbaselabs/jenkins-sdk.git
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.COUCH_SSH_PRIVATE_KEY }}
-      - name: create FIT network
-        run: |
-          docker network create -d bridge fit
-      - name: Download and setup cb-dino cluster
-        run: |
-          wget https://github.com/couchbaselabs/cbdinocluster/releases/download/v0.0.9/cbdinocluster-linux
-          chmod 744 ./cbdinocluster-linux
-      - name: init cbdino cluster
-        run: |
+      # - name: clone and setup fit
+      #   run: |
+      #     git clone git@github.com:couchbaselabs/transactions-fit-performer.git
+      #     # cherry-pick
+      #     cd transactions-fit-performer
+      #     git fetch ssh://littlefermatlives@review.couchbase.org:29418/transactions-fit-performer refs/changes/02/197302/36 && git checkout FETCH_HEAD
+      #     docker build --no-cache -f test-driver/Dockerfile -t fit/test-driver:latest .
+      #   env:
+      #     SSH_PRIVATE_KEY: ${{ secrets.COUCH_SSH_PRIVATE_KEY }}
+      # - name: clone jenkins sdk repo
+      #   run: |
+      #     git clone git@github.com:couchbaselabs/jenkins-sdk.git
+      #   env:
+      #     SSH_PRIVATE_KEY: ${{ secrets.COUCH_SSH_PRIVATE_KEY }}
+      # - name: create FIT network
+      #   run: |
+      #     docker network create -d bridge fit
+      # - name: Download and setup cb-dino cluster
+      #   run: |
+      #     wget https://github.com/couchbaselabs/cbdinocluster/releases/download/v0.0.9/cbdinocluster-linux
+      #     chmod 744 ./cbdinocluster-linux
+      # - name: init cbdino cluster
+      #   run: |
           # sudo systemctl stop docker.socket
-          echo -e "n\nn\nn\nY\nn" | ./cbdinocluster-linux init --aws-region ${{ vars.AWS_REGION }} --capella-aws-region ${{ vars.CAP_AWS_REGION }} --capella-endpoint ${{ vars.CAP_END_POINT }} --capella-oid ${{ vars.CAP_OID }} --capella-user ${{ vars.CAP_USER }} --capella-pass ${{ vars.CAP_PASS }} --disable-docker "true"
+          # echo -e "n\nn\nn\nY\nn" | ./cbdinocluster-linux init --aws-region ${{ vars.AWS_REGION }} --capella-aws-region ${{ vars.CAP_AWS_REGION }} --capella-endpoint ${{ vars.CAP_END_POINT }} --capella-oid ${{ vars.CAP_OID }} --capella-user ${{ vars.CAP_USER }} --capella-pass ${{ vars.CAP_PASS }} --disable-docker "true"
           # ./cbdinocluster-linux allocate simple:7.2.0
-          cat ~/.cbdinocluster
+          # cat ~/.cbdinocluster
           # sudo systemctl start docker.socket
           # ./cbdinocluster-linux allocate simple:7.2.0
       # - name: start ${{ vars.PERFORMER }}  performer
@@ -62,24 +64,24 @@ jobs:
       #     cd jenkins-sdk
       #     ./gradlew buildPerformer --args="-d ../ -i ${{ vars.PERFORMER }}-performer -s ${{ vars.PERFORMER }}"
       #     docker run --network=fit -d -p 8060:8060 ${{ vars.PERFORMER }}-performer
-      - name: Edit values from the FITConfiguration.json
-        run: |
-          cd transactions-fit-performer/test-driver
-          echo "`jq --arg e "${{ vars.URL }}" '.situational.capella.url=$e' FITConfiguration.example.json`" > FITConfiguration.json
-          echo "`jq --arg e "${{ vars.EXCLUDETESTS }}" '.excludeTests=[$e]' FITConfiguration.json`" > FITConfiguration.json
-          echo "`jq --arg e "${{ vars.ACCESSKEY }}" '.situational.capella.accessKey=$e' FITConfiguration.json`" > FITConfiguration.json
-          echo "`jq --arg e "${{ vars.PRIVATEKEY }}" '.situational.capella.privateKey=$e' FITConfiguration.json`" > FITConfiguration.json
-          echo "`jq --arg e "${{ vars.PROJECTID }}" '.situational.capella.projectId=$e' FITConfiguration.json`" > FITConfiguration.json
-          echo "`jq --arg e "${{ vars.TENANTID }}" '.situational.capella.tenantId=$e' FITConfiguration.json`" > FITConfiguration.json
-          echo "`jq --arg e "${{ vars.USERNAME }}" '.situational.capella.username=$e' FITConfiguration.json`" > FITConfiguration.json
-          echo "`jq --arg e "${{ vars.PASSWORD }}" '.situational.capella.password=$e' FITConfiguration.json`" > FITConfiguration.json
-          echo "`jq --arg e "${{ vars.PGHOST }}" '.situational.database.jdbc=$e' FITConfiguration.json`" > FITConfiguration.json
-          echo "`jq --arg e "${{ vars.PGUSERNAME }}" '.situational.database.username=$e' FITConfiguration.json`" > FITConfiguration.json
-          echo "`jq --arg e "${{ vars.PGPASSWORD }}" '.situational.database.password=$e' FITConfiguration.json`" > FITConfiguration.json
-          echo "`jq 'del(.situational.capella.overrideToken)' FITConfiguration.json`" > FITConfiguration.json
-          echo "`jq 'del(.situational.capella.cloudProvider)' FITConfiguration.json`" > FITConfiguration.json
-          echo "`jq 'del(.situational.capella.region)' FITConfiguration.json`" > FITConfiguration.json
-          cat FITConfiguration.json
+      # - name: Edit values from the FITConfiguration.json
+      #   run: |
+      #     cd transactions-fit-performer/test-driver
+      #     echo "`jq --arg e "${{ vars.URL }}" '.situational.capella.url=$e' FITConfiguration.example.json`" > FITConfiguration.json
+      #     echo "`jq --arg e "${{ vars.EXCLUDETESTS }}" '.excludeTests=[$e]' FITConfiguration.json`" > FITConfiguration.json
+      #     echo "`jq --arg e "${{ vars.ACCESSKEY }}" '.situational.capella.accessKey=$e' FITConfiguration.json`" > FITConfiguration.json
+      #     echo "`jq --arg e "${{ vars.PRIVATEKEY }}" '.situational.capella.privateKey=$e' FITConfiguration.json`" > FITConfiguration.json
+      #     echo "`jq --arg e "${{ vars.PROJECTID }}" '.situational.capella.projectId=$e' FITConfiguration.json`" > FITConfiguration.json
+      #     echo "`jq --arg e "${{ vars.TENANTID }}" '.situational.capella.tenantId=$e' FITConfiguration.json`" > FITConfiguration.json
+      #     echo "`jq --arg e "${{ vars.USERNAME }}" '.situational.capella.username=$e' FITConfiguration.json`" > FITConfiguration.json
+      #     echo "`jq --arg e "${{ vars.PASSWORD }}" '.situational.capella.password=$e' FITConfiguration.json`" > FITConfiguration.json
+      #     echo "`jq --arg e "${{ vars.PGHOST }}" '.situational.database.jdbc=$e' FITConfiguration.json`" > FITConfiguration.json
+      #     echo "`jq --arg e "${{ vars.PGUSERNAME }}" '.situational.database.username=$e' FITConfiguration.json`" > FITConfiguration.json
+      #     echo "`jq --arg e "${{ vars.PGPASSWORD }}" '.situational.database.password=$e' FITConfiguration.json`" > FITConfiguration.json
+      #     echo "`jq 'del(.situational.capella.overrideToken)' FITConfiguration.json`" > FITConfiguration.json
+      #     echo "`jq 'del(.situational.capella.cloudProvider)' FITConfiguration.json`" > FITConfiguration.json
+      #     echo "`jq 'del(.situational.capella.region)' FITConfiguration.json`" > FITConfiguration.json
+          # cat FITConfiguration.json
 #      - name: Generate the gRPC
 #        run: |
 #          cd transactions-fit-performer/gRPC/jvm
