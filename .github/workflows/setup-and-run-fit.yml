@@ -46,7 +46,7 @@ jobs:
       - name: Download and setup cb-dino cluster
         run: |
           wget https://github.com/couchbaselabs/cbdinocluster/releases/download/v0.0.9/cbdinocluster-linux
-          chmod 400 ./cbdinocluster-linux
+          chmod 744 ./cbdinocluster-linux
           ./cbdinocluster-linux init --auto
       - name: start ${{ vars.PERFORMER }}  performer
         run: |
