@@ -53,7 +53,7 @@ jobs:
       - name: init cbdino cluster
         run: |
           # sudo systemctl stop docker.socket
-          echo -e "n\n\n\Y\n" | ./cbdinocluster-linux init --aws-region ${{ vars.AWS_REGION }} --capella-aws-region ${{ vars.CAP_AWS_REGION }} --capella-endpoint ${{ vars.CAP_END_POINT }} --capella-oid ${{ vars.CAP_OID }} --capella-user ${{ vars.CAP_USER }} --capella-pass ${{ vars.CAP_PASS }} --disable-docker "true"
+          echo -e "n\nn\nn\nY\nn" | ./cbdinocluster-linux init --aws-region ${{ vars.AWS_REGION }} --capella-aws-region ${{ vars.CAP_AWS_REGION }} --capella-endpoint ${{ vars.CAP_END_POINT }} --capella-oid ${{ vars.CAP_OID }} --capella-user ${{ vars.CAP_USER }} --capella-pass ${{ vars.CAP_PASS }} --disable-docker "true"
           # ./cbdinocluster-linux allocate simple:7.2.0
           cat ~/.cbdinocluster
           # sudo systemctl start docker.socket
