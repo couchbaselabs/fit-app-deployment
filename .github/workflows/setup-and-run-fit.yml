@@ -48,7 +48,7 @@ jobs:
           rm -rf ~/.cbdinocluster
           wget https://github.com/couchbaselabs/cbdinocluster/releases/download/v0.0.9/cbdinocluster-linux
           chmod 744 ./cbdinocluster-linux
-          echo "n" | ./cbdinocluster-linux init --aws-region ${{ vars.AWS_REGION }} --capella-aws-region ${{ vars.CAP_AWS_REGION }} --capella-endpoint ${{ vars.CAP_END_POINT }} --capella-oid ${{ vars.CAP_OID }} --capella-user ${{ vars.CAP_USER }} --capella-pass ${{ vars.CAP_PASS }}
+          echo "N" | ./cbdinocluster-linux init --aws-region ${{ vars.AWS_REGION }} --capella-aws-region ${{ vars.CAP_AWS_REGION }} --capella-endpoint ${{ vars.CAP_END_POINT }} --capella-oid ${{ vars.CAP_OID }} --capella-user ${{ vars.CAP_USER }} --capella-pass ${{ vars.CAP_PASS }} --disable-docker false
       # - name: start ${{ vars.PERFORMER }}  performer
       #   run: |
       #     cd jenkins-sdk
