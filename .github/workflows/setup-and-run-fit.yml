@@ -57,7 +57,7 @@ jobs:
           # ./cbdinocluster-linux allocate simple:7.2.0
           cat ~/.cbdinocluster
           sudo systemctl start docker.socket
-          ./cbdinocluster-linux init allocate simple:7.2.0
+          ./cbdinocluster-linux allocate simple:7.2.0
       # - name: start ${{ vars.PERFORMER }}  performer
       #   run: |
       #     cd jenkins-sdk
