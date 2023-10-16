@@ -31,6 +31,8 @@ jobs:
       - name: clone and setup fit
         run: |
           git clone git@github.com:couchbaselabs/transactions-fit-performer.git
+          # cherry-pick
+          git fetch ssh://littlefermatlives@review.couchbase.org:29418/transactions-fit-performer refs/changes/02/197302/36 && git cherry-pick FETCH_HEAD
           cd transactions-fit-performer
           docker build --no-cache -f test-driver/Dockerfile -t fit/test-driver:latest .
         env:
@@ -46,9 +48,6 @@ jobs:
       - name: Download and setup cb-dino cluster
         run: |
           wget https://github.com/couchbaselabs/cbdinocluster/releases/download/v0.0.9/cbdinocluster-linux
-          # cat ~/.cbdinocluster
-          # rm -rf ~/.cbdinocluster
-          # find -L . -name "foo*"
           chmod 744 ./cbdinocluster-linux
       - name: init cbdino cluster
         run: |
@@ -57,7 +56,7 @@ jobs:
           # ./cbdinocluster-linux allocate simple:7.2.0
           cat ~/.cbdinocluster
           # sudo systemctl start docker.socket
-          ./cbdinocluster-linux allocate simple:7.2.0
+          # ./cbdinocluster-linux allocate simple:7.2.0
       # - name: start ${{ vars.PERFORMER }}  performer
       #   run: |
       #     cd jenkins-sdk
