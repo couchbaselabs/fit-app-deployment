@@ -65,7 +65,7 @@ jobs:
       - name: Edit values from the FITConfiguration.json
         run: |
           cd transactions-fit-performer/test-driver
-          echo "`jq --arg e "${{ vars.EXCLUDETESTS }}" '.excludeTests=[$e]' FITConfiguration.json`" > FITConfiguration.json
+          echo "`jq --arg e "${{ vars.EXCLUDETESTS }}" '.excludeTests=[$e]' FITConfiguration.example.json`" > FITConfiguration.json
           # echo "`jq --arg e "${{ vars.URL }}" '.situational.capella.url=$e' FITConfiguration.example.json`" > FITConfiguration.json
           echo "`jq --arg e "${{ vars.SERVER_VERSION }}" '.situational.cbdino.version=$e' FITConfiguration.json`" > FITConfiguration.json
           echo "`jq --arg e "${{ vars.DEPLOYER }}" '.situational.cbdino.deployer=$e' FITConfiguration.json`" > FITConfiguration.json
