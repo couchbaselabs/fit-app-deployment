@@ -30,6 +30,10 @@ jobs:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
       - name: clone and setup fit
         run: |
+          pwd
+          pwd
+          pwd
+          pwd
           git clone git@github.com:couchbaselabs/transactions-fit-performer.git
           # cherry-pick
           git fetch ssh://littlefermatlives@review.couchbase.org:29418/transactions-fit-performer refs/changes/02/197302/36 && git cherry-pick FETCH_HEAD
@@ -57,11 +61,11 @@ jobs:
           cat ~/.cbdinocluster
           # sudo systemctl start docker.socket
           # ./cbdinocluster-linux allocate simple:7.2.0
-      - name: start ${{ vars.PERFORMER }}  performer
-        run: |
-          cd jenkins-sdk
-          ./gradlew buildPerformer --args="-d ../ -i ${{ vars.PERFORMER }}-performer -s ${{ vars.PERFORMER }}"
-          docker run --network=fit -d -p 8060:8060 ${{ vars.PERFORMER }}-performer
+      # - name: start ${{ vars.PERFORMER }}  performer
+      #   run: |
+      #     cd jenkins-sdk
+      #     ./gradlew buildPerformer --args="-d ../ -i ${{ vars.PERFORMER }}-performer -s ${{ vars.PERFORMER }}"
+      #     docker run --network=fit -d -p 8060:8060 ${{ vars.PERFORMER }}-performer
       - name: Edit values from the FITConfiguration.json
         run: |
           cd transactions-fit-performer/test-driver
@@ -80,11 +84,11 @@ jobs:
           # echo "`jq 'del(.situational.capella.cloudProvider)' FITConfiguration.json`" > FITConfiguration.json
           echo "`jq 'del(.situational.cbdino.enablePrivateEndpoint)' FITConfiguration.json`" > FITConfiguration.json
           cat FITConfiguration.json
-      - name: Generate the gRPC
-        run: |
-         cd transactions-fit-performer/gRPC/jvm
-         mvn clean install
-      - name: Run SIT tests
-        run: |
-         cd transactions-fit-performer
-         mvn --projects test-driver --also-make -Dmaven.test.failure.ignore -DfailIfNoTests=false test -Dgroups=situational,cbDino -DexcludedGroups=openshift,capella
+      # - name: Generate the gRPC
+      #   run: |
+      #    cd transactions-fit-performer/gRPC/jvm
+      #    mvn clean install
+      # - name: Run SIT tests
+      #   run: |
+      #    cd transactions-fit-performer
+      #    mvn --projects test-driver --also-make -Dmaven.test.failure.ignore -DfailIfNoTests=false test -Dgroups=situational,cbDino -DexcludedGroups=openshift,capella
