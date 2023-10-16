@@ -32,8 +32,7 @@ jobs:
         run: |
           git config --global user.email "saurabh.mishra@couchbase.com"
           git config --global user.name "littlefermatlives"
-          git remote -v
-          git clone ssh://littlefermatlives@review.couchbase.org:29418/transactions-fit-performer
+          git clone ssh://littlefermatlives@review.couchbase.org:29418/transactions-fit-performer.git
           # git remote set-url origin https://review.couchbase.org/transactions-fit-performer
           # git clone https://review.couchbase.org/transactions-fit-performer
           # cherry-pick
