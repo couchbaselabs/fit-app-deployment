@@ -46,13 +46,13 @@ jobs:
       - name: Download and setup cb-dino cluster
         run: |
           wget https://github.com/couchbaselabs/cbdinocluster/releases/download/v0.0.9/cbdinocluster-linux
-          chmod 744 ./cbdinocluster-linux
-          ./cbdinocluster-linux init --auto
-      - name: start ${{ vars.PERFORMER }}  performer
-        run: |
-          cd jenkins-sdk
-          ./gradlew buildPerformer --args="-d ../ -i ${{ vars.PERFORMER }}-performer -s ${{ vars.PERFORMER }}"
-          docker run --network=fit -d -p 8060:8060 ${{ vars.PERFORMER }}-performer
+          chmod 744 ./cbdinocluster-linuxe
+          echo "n" | ./cbdinocluster-linux init --aws-region ${{ vars.AWS_REGION }} --capella-aws-region ${{ vars.CAP_AWS_REGION }} --capella-endpoint ${{ vars.CAP_END_POINT }} --capella-oid ${{ vars.CAP_OID }} --capella-user ${{ vars.CAP_USER }} --capella-pass ${{ vars.CAP_PASS }}
+      # - name: start ${{ vars.PERFORMER }}  performer
+      #   run: |
+      #     cd jenkins-sdk
+      #     ./gradlew buildPerformer --args="-d ../ -i ${{ vars.PERFORMER }}-performer -s ${{ vars.PERFORMER }}"
+      #     docker run --network=fit -d -p 8060:8060 ${{ vars.PERFORMER }}-performer
       - name: Edit values from the FITConfiguration.json
         run: |
           cd transactions-fit-performer/test-driver
