@@ -1,0 +1,42 @@
+name: Run Dino Test
+on: push
+jobs:
+  dino-test:
+    name: Test in Cloud
+    strategy:
+      matrix:
+        cloud: [aws, azure]
+    runs-on:
+      - self-hosted
+      - ${{ matrix.cloud }}
+    steps:
+      - name: Download cbdinocluster
+        run: |
+          wget -nv -O ./cbdinocluster https://github.com/couchbaselabs/cbdinocluster/releases/download/v0.0.5/cbdinocluster-linux
+          chmod +x cbdinocluster
+      - name: Setup cbdinocluster
+        env:
+          GITHUB_TOKEN: ${{ secrets.GHCR_TOKEN }}
+          CAPELLA_USER: ${{ vars.CAPELLA_USER }}
+          CAPELLA_PASS: ${{ secrets.CAPELLA_PASS }}
+          CAPELLA_OID: ${{ vars.CAPELLA_OID }}
+        run: |
+          chmod +x ./cbdinocluster
+          ./cbdinocluster -v init --auto
+      - name: Setup Cluster
+        run: |
+          CBDC_ID=$(./cbdinocluster -v alloc simple:7.1 --deployer cloud)
+          echo "CBDC_ID=$CBDC_ID" >> "$GITHUB_ENV"
+      - name: Setup Private Link
+        run: |
+          ./cbdinocluster -v private-endpoints enable $CBDC_ID
+          ./cbdinocluster -v private-endpoints setup-link $CBDC_ID --auto
+      - name: Run Test
+        run: |
+          CBDC_MGMT=$(./cbdinocluster -v private-endpoints mgmt $CBDC_ID --wait-visible)
+          curl --insecure $CBDC_MGMT
+      - name: Cleanup Cluster
+        if: always()
+        run: |
+          ./cbdinocluster -v rm $CBDC_ID
+          ./cbdinocluster -v cleanup

@@ -1,0 +1,10 @@
+name: Run Azure Test
+on: workflow_dispatch
+jobs:
+  tests:
+    name: Test
+    runs-on: [self-hosted, azure]
+    steps:
+      - name: Test
+        run: |
+          az account show
