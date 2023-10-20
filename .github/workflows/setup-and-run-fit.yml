@@ -49,16 +49,14 @@ jobs:
           chmod 744 ./cbdinocluster-linux
       - name: init cbdino cluster
         run: |
-          case "${{ github.event_name }}" in
-            ("cloud")
-              echo -e "n\nn\nn\nY\nn" | ./cbdinocluster-linux init --capella-endpoint ${{ vars.CAP_END_POINT }} --capella-oid ${{ vars.CAP_OID }} --capella-user ${{ vars.CAP_USER }} --capella-pass ${{ vars.CAP_PASS }}
-              ;;
-            (*)
+          case "${{ vars.DEPLOYER }}" in
+            ("docker")
               ./cbdinocluster-linux init --auto
               ;;
+            (*)
+              echo -e "n\nn\nn\nY\nn" | ./cbdinocluster-linux init --capella-endpoint ${{ vars.CAP_END_POINT }} --capella-oid ${{ vars.CAP_OID }} --capella-user ${{ vars.CAP_USER }} --capella-pass ${{ vars.CAP_PASS }}
               ;;
           esac
-          
           cat ~/.cbdinocluster
       # - name: start ${{ vars.PERFORMER }}  performer
       #   run: |
