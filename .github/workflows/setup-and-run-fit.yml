@@ -49,7 +49,7 @@ jobs:
           chmod 744 ./cbdinocluster-linux
       - name: init cbdino cluster
         run: |
-          echo -e "n\nn\nn\nY\nn" | ./cbdinocluster-linux init --capella-aws-region ${{ vars.CAP_AWS_REGION }} --capella-endpoint ${{ vars.CAP_END_POINT }} --capella-oid ${{ vars.CAP_OID }} --capella-user ${{ vars.CAP_USER }} --capella-pass ${{ vars.CAP_PASS }}
+          echo -e "n\nn\nn\nY\nn" | ./cbdinocluster-linux init --capella-endpoint ${{ vars.CAP_END_POINT }} --capella-oid ${{ vars.CAP_OID }} --capella-user ${{ vars.CAP_USER }} --capella-pass ${{ vars.CAP_PASS }}
           cat ~/.cbdinocluster
       - name: start ${{ vars.PERFORMER }}  performer
         run: |
