@@ -42,7 +42,22 @@ jobs:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
       - name: create FIT network
         run: |
-          docker network create -d bridge fit 
+          docker network create -d bridge fit
+      - name: Download and setup cb-dino cluster
+        run: |
+          wget https://github.com/couchbaselabs/cbdinocluster/releases/download/v0.0.9/cbdinocluster-linux
+          chmod 744 ./cbdinocluster-linux
+      - name: init cbdino cluster for ${{ vars.DEPLOYER }}
+        run: |
+          case "${{ vars.DEPLOYER }}" in
+            ("docker")
+              ./cbdinocluster-linux init --auto
+              ;;
+            (*)
+              echo -e "n\nn\nn\nY\nn" | ./cbdinocluster-linux init --capella-endpoint ${{ vars.CAP_END_POINT }} --capella-oid ${{ vars.CAP_OID }} --capella-user ${{ vars.CAP_USER }} --capella-pass ${{ vars.CAP_PASS }}
+              ;;
+          esac
+          cat ~/.cbdinocluster
       - name: start ${{ vars.PERFORMER }}  performer
         run: |
           cd jenkins-sdk
@@ -51,26 +66,21 @@ jobs:
       - name: Edit values from the FITConfiguration.json
         run: |
           cd transactions-fit-performer/test-driver
-          echo "`jq --arg e "${{ vars.URL }}" '.situational.capella.url=$e' FITConfiguration.example.json`" > FITConfiguration.json
-          echo "`jq --arg e "${{ vars.EXCLUDETESTS }}" '.excludeTests=[$e]' FITConfiguration.json`" > FITConfiguration.json
-          echo "`jq --arg e "${{ vars.ACCESSKEY }}" '.situational.capella.accessKey=$e' FITConfiguration.json`" > FITConfiguration.json
-          echo "`jq --arg e "${{ vars.PRIVATEKEY }}" '.situational.capella.privateKey=$e' FITConfiguration.json`" > FITConfiguration.json
-          echo "`jq --arg e "${{ vars.PROJECTID }}" '.situational.capella.projectId=$e' FITConfiguration.json`" > FITConfiguration.json
-          echo "`jq --arg e "${{ vars.TENANTID }}" '.situational.capella.tenantId=$e' FITConfiguration.json`" > FITConfiguration.json
-          echo "`jq --arg e "${{ vars.USERNAME }}" '.situational.capella.username=$e' FITConfiguration.json`" > FITConfiguration.json
-          echo "`jq --arg e "${{ vars.PASSWORD }}" '.situational.capella.password=$e' FITConfiguration.json`" > FITConfiguration.json
+          echo "`jq --arg e "${{ vars.EXCLUDETESTS }}" '.excludeTests=[$e]' FITConfiguration.example.json`" > FITConfiguration.json
+          echo "`jq --arg e "${{ vars.SERVER_VERSION }}" '.situational.cbdino.version=$e' FITConfiguration.json`" > FITConfiguration.json
+          echo "`jq --arg e "${{ vars.DEPLOYER }}" '.situational.cbdino.deployer=$e' FITConfiguration.json`" > FITConfiguration.json
+          echo "`jq --arg e "${{ vars.REGION }}" '.situational.cbdino.region=$e' FITConfiguration.json`" > FITConfiguration.json
+          echo "`jq --arg e "${{ vars.CBDINO_PATH }}" '.situational.cbdino.cbDinoClusterAppPath=$e' FITConfiguration.json`" > FITConfiguration.json
           echo "`jq --arg e "${{ vars.PGHOST }}" '.situational.database.jdbc=$e' FITConfiguration.json`" > FITConfiguration.json
           echo "`jq --arg e "${{ vars.PGUSERNAME }}" '.situational.database.username=$e' FITConfiguration.json`" > FITConfiguration.json
           echo "`jq --arg e "${{ vars.PGPASSWORD }}" '.situational.database.password=$e' FITConfiguration.json`" > FITConfiguration.json
-          echo "`jq 'del(.situational.capella.overrideToken)' FITConfiguration.json`" > FITConfiguration.json
-          echo "`jq 'del(.situational.capella.cloudProvider)' FITConfiguration.json`" > FITConfiguration.json
-          echo "`jq 'del(.situational.capella.region)' FITConfiguration.json`" > FITConfiguration.json
+          echo "`jq --argjson e "${{ vars.ENABLE_PE }}" '.situational.cbdino.enablePrivateEndpoint=$e' FITConfiguration.json`" > FITConfiguration.json
           cat FITConfiguration.json
       - name: Generate the gRPC
         run: |
-          cd transactions-fit-performer/gRPC/jvm
-          mvn clean install  
+         cd transactions-fit-performer/gRPC/jvm
+         mvn clean install
       - name: Run SIT tests
         run: |
-          cd transactions-fit-performer
-          mvn --projects test-driver --also-make -Dmaven.test.failure.ignore -DfailIfNoTests=false test -Dgroups=situational,capella -DexcludedGroups=openshift
+         cd transactions-fit-performer
+         mvn --projects test-driver --also-make -Dmaven.test.failure.ignore -DfailIfNoTests=false test -Dgroups=situational,cbDino -DexcludedGroups=openshift,capella
