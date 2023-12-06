@@ -1,0 +1,10 @@
+name: Run AWS Test
+on: workflow_dispatch
+jobs:
+  tests:
+    name: Test
+    runs-on: [self-hosted, aws]
+    steps:
+      - name: Test
+        run: |
+          aws sts get-caller-identity
