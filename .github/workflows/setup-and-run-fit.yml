@@ -22,9 +22,11 @@ jobs:
         with:
             host: github.com
             private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-      - name: which maven
+      - name: install maven
         run: |
-          which mvn
+          sudo apt-get update
+          sudo apt-get install -y maven
+          mvn -version
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
       - name: clone and setup couchbase jvm client 
