@@ -1,6 +1,6 @@
 name: Run SIT Tests
 run-name: ${{ github.actor }} Run SIT tests
-on: [push]
+on: workflow_dispatch
 jobs:
   build:
     name: Build
