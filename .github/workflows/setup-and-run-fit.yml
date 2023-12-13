@@ -54,6 +54,7 @@ jobs:
         run: |
           wget https://github.com/couchbaselabs/cbdinocluster/releases/download/v0.0.9/cbdinocluster-linux
           chmod 744 ./cbdinocluster-linux
+          pwd
       - name: init cbdino cluster for ${{ vars.DEPLOYER }}
         run: |
           case "${{ vars.DEPLOYER }}" in
