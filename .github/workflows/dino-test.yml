@@ -1,42 +1,85 @@
-name: Run Dino Test
-on: push
+name: Run SIT tests with private endpoints
+on: workflow_dispatch
 jobs:
-  dino-test:
-    name: Test in Cloud
-    strategy:
-      matrix:
-        cloud: [aws, azure]
-    runs-on:
-      - self-hosted
-      - ${{ matrix.cloud }}
+  build:
+    name: Build
+    runs-on: [self-hosted, aws]
+    environment:
+      name: env
     steps:
-      - name: Download cbdinocluster
+      - uses: actions/checkout@v3
+      - name: Set up Maven Central Repository
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          server-id: ossrh
+          server-username: MAVEN_USERNAME
+          server-password: MAVEN_PASSWORD
+      - name: Setup SSH
+        uses: MrSquaare/ssh-setup-action@v1
+        with:
+            host: github.com
+            private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+      - name: clone and setup couchbase jvm client
         run: |
-          wget -nv -O ./cbdinocluster https://github.com/couchbaselabs/cbdinocluster/releases/download/v0.0.5/cbdinocluster-linux
-          chmod +x cbdinocluster
-      - name: Setup cbdinocluster
+          git clone git@github.com:couchbase/couchbase-jvm-clients.git
+          cd couchbase-jvm-clients
         env:
-          GITHUB_TOKEN: ${{ secrets.GHCR_TOKEN }}
-          CAPELLA_USER: ${{ vars.CAPELLA_USER }}
-          CAPELLA_PASS: ${{ secrets.CAPELLA_PASS }}
-          CAPELLA_OID: ${{ vars.CAPELLA_OID }}
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+      - name: clone and setup fit
         run: |
-          chmod +x ./cbdinocluster
-          ./cbdinocluster -v init --auto
-      - name: Setup Cluster
+          git clone git@github.com:couchbaselabs/transactions-fit-performer.git
+          cd transactions-fit-performer
+          docker build --no-cache -f test-driver/Dockerfile -t fit/test-driver:latest .
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+      - name: clone jenkins sdk repo
         run: |
-          CBDC_ID=$(./cbdinocluster -v alloc simple:7.1 --deployer cloud)
-          echo "CBDC_ID=$CBDC_ID" >> "$GITHUB_ENV"
-      - name: Setup Private Link
+          git clone git@github.com:couchbaselabs/jenkins-sdk.git
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+      - name: create FIT network
         run: |
-          ./cbdinocluster -v private-endpoints enable $CBDC_ID
-          ./cbdinocluster -v private-endpoints setup-link $CBDC_ID --auto
-      - name: Run Test
+          docker network create -d bridge fit
+      - name: Download and setup cb-dino cluster
         run: |
-          CBDC_MGMT=$(./cbdinocluster -v private-endpoints mgmt $CBDC_ID --wait-visible)
-          curl --insecure $CBDC_MGMT
-      - name: Cleanup Cluster
-        if: always()
+          wget https://github.com/couchbaselabs/cbdinocluster/releases/download/v0.0.9/cbdinocluster-linux
+          chmod 744 ./cbdinocluster-linux
+      - name: init cbdino cluster for ${{ vars.DEPLOYER }}
         run: |
-          ./cbdinocluster -v rm $CBDC_ID
-          ./cbdinocluster -v cleanup
+          case "${{ vars.DEPLOYER }}" in
+            ("docker")
+              ./cbdinocluster-linux init --auto
+              ;;
+            (*)
+              echo -e "n\nn\nn\nY\nn" | ./cbdinocluster-linux init --capella-endpoint ${{ vars.CAP_END_POINT }} --capella-oid ${{ vars.CAP_OID }} --capella-user ${{ vars.CAP_USER }} --capella-pass ${{ vars.CAP_PASS }}
+              ;;
+          esac
+          cat ~/.cbdinocluster
+      - name: start ${{ vars.PERFORMER }}  performer
+        run: |
+          cd jenkins-sdk
+          ./gradlew buildPerformer --args="-d ../ -i ${{ vars.PERFORMER }}-performer -s ${{ vars.PERFORMER }}"
+          docker run --network=fit -d -p 8060:8060 ${{ vars.PERFORMER }}-performer
+      - name: Edit values from the FITConfiguration.json
+        run: |
+          cd transactions-fit-performer/test-driver
+          echo "`jq --arg e "${{ vars.EXCLUDETESTS }}" '.excludeTests=[$e]' FITConfiguration.example.json`" > FITConfiguration.json
+          echo "`jq --arg e "${{ vars.SERVER_VERSION }}" '.situational.cbdino.version=$e' FITConfiguration.json`" > FITConfiguration.json
+          echo "`jq --arg e "${{ vars.DEPLOYER }}" '.situational.cbdino.deployer=$e' FITConfiguration.json`" > FITConfiguration.json
+          echo "`jq --arg e "${{ vars.REGION }}" '.situational.cbdino.region=$e' FITConfiguration.json`" > FITConfiguration.json
+          echo "`jq --arg e "${{ vars.CBDINO_PATH }}" '.situational.cbdino.cbDinoClusterAppPath=$e' FITConfiguration.json`" > FITConfiguration.json
+          echo "`jq --arg e "${{ vars.PGHOST }}" '.situational.database.jdbc=$e' FITConfiguration.json`" > FITConfiguration.json
+          echo "`jq --arg e "${{ vars.PGUSERNAME }}" '.situational.database.username=$e' FITConfiguration.json`" > FITConfiguration.json
+          echo "`jq --arg e "${{ vars.PGPASSWORD }}" '.situational.database.password=$e' FITConfiguration.json`" > FITConfiguration.json
+          echo "`jq --argjson e "${{ vars.ENABLE_PE }}" '.situational.cbdino.enablePrivateEndpoint=$e' FITConfiguration.json`" > FITConfiguration.json
+          cat FITConfiguration.json
+      - name: Generate the gRPC
+        run: |
+         cd transactions-fit-performer/gRPC/jvm
+         mvn clean install
+      - name: Run SIT tests
+        run: |
+         cd transactions-fit-performer
+         mvn --projects test-driver --also-make -Dmaven.test.failure.ignore -DfailIfNoTests=false test -Dgroups=situational,cbDino -DexcludedGroups=openshift,capella
