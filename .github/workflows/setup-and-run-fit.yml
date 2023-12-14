@@ -64,6 +64,7 @@ jobs:
           git clone git@github.com:couchbaselabs/transactions-fit-performer.git
           cd transactions-fit-performer/gRPC/jvm
           mvn clean install
+          cd ../..
           docker build --no-cache -f test-driver/Dockerfile -t fit/test-driver:latest .
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
