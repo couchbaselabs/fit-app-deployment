@@ -1,5 +1,5 @@
-name: Run SIT Tests
-run-name: ${{ github.actor }} Run SIT tests
+name: Run SIT tests with private endpoints
+run-name: ${{ github.actor }} Run SIT tests with private endpoints
 on: workflow_dispatch
 jobs:
   build:
@@ -62,6 +62,7 @@ jobs:
       - name: clone and setup fit
         run: |
           git clone git@github.com:couchbaselabs/transactions-fit-performer.git
+          git fetch ssh://littlefermatlives@review.couchbase.org:29418/transactions-fit-performer refs/changes/69/201869/1 && git cherry-pick FETCH_HEAD
           cd transactions-fit-performer/gRPC/jvm
           mvn clean install
           cd ../..
