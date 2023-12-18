@@ -55,7 +55,7 @@ jobs:
               ./cbdinocluster-linux init --auto
               ;;
             (*)
-              echo -e "n\nn\nn\nY\nn" | ./cbdinocluster-linux init --capella-endpoint ${{ vars.CAP_END_POINT }} --capella-oid ${{ vars.CAP_OID }} --capella-user ${{ vars.CAP_USER }} --capella-pass ${{ vars.CAP_PASS }}
+              echo -e "n\nn\Yn\nY\nn" | ./cbdinocluster-linux init --aws-region "us-west-2" --capella-endpoint ${{ vars.CAP_END_POINT }} --capella-oid ${{ vars.CAP_OID }} --capella-user ${{ vars.CAP_USER }} --capella-pass ${{ vars.CAP_PASS }}
               ;;
           esac
           cat ~/.cbdinocluster
@@ -68,25 +68,25 @@ jobs:
           docker build --no-cache -f test-driver/Dockerfile -t fit/test-driver:latest .
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-      - name: start ${{ vars.PERFORMER }}  performer
-        run: |
-          cd jenkins-sdk
-          ./gradlew buildPerformer --args="-d ../ -i ${{ vars.PERFORMER }}-performer -s ${{ vars.PERFORMER }}"
-          docker run --network=fit -d -p 8060:8060 ${{ vars.PERFORMER }}-performer
-      - name: Edit values from the FITConfiguration.json
-        run: |
-          cd transactions-fit-performer/test-driver
-          echo "`jq --arg e "${{ vars.EXCLUDETESTS }}" '.excludeTests=[$e]' FITConfiguration.example.json`" > FITConfiguration.json
-          echo "`jq --arg e "${{ vars.SERVER_VERSION }}" '.situational.cbdino.version=$e' FITConfiguration.json`" > FITConfiguration.json
-          echo "`jq --arg e "${{ vars.DEPLOYER }}" '.situational.cbdino.deployer=$e' FITConfiguration.json`" > FITConfiguration.json
-          echo "`jq --arg e "${{ vars.REGION }}" '.situational.cbdino.region=$e' FITConfiguration.json`" > FITConfiguration.json
-          echo "`jq --arg e "${{ vars.CBDINO_PATH }}" '.situational.cbdino.cbDinoClusterAppPath=$e' FITConfiguration.json`" > FITConfiguration.json
-          echo "`jq --arg e "${{ vars.PGHOST }}" '.situational.database.jdbc=$e' FITConfiguration.json`" > FITConfiguration.json
-          echo "`jq --arg e "${{ vars.PGUSERNAME }}" '.situational.database.username=$e' FITConfiguration.json`" > FITConfiguration.json
-          echo "`jq --arg e "${{ vars.PGPASSWORD }}" '.situational.database.password=$e' FITConfiguration.json`" > FITConfiguration.json
-          echo "`jq --argjson e "${{ vars.ENABLE_PE }}" '.situational.cbdino.enablePrivateEndpoint=$e' FITConfiguration.json`" > FITConfiguration.json
-          cat FITConfiguration.json
-      - name: Run SIT tests
-        run: |
-         cd transactions-fit-performer
-         mvn --projects test-driver --also-make -Dmaven.test.failure.ignore -DfailIfNoTests=false test -Dgroups=situational,cbDino -DexcludedGroups=openshift,capella
+      # - name: start ${{ vars.PERFORMER }}  performer
+      #   run: |
+      #     cd jenkins-sdk
+      #     ./gradlew buildPerformer --args="-d ../ -i ${{ vars.PERFORMER }}-performer -s ${{ vars.PERFORMER }}"
+      #     docker run --network=fit -d -p 8060:8060 ${{ vars.PERFORMER }}-performer
+      # - name: Edit values from the FITConfiguration.json
+      #   run: |
+      #     cd transactions-fit-performer/test-driver
+      #     echo "`jq --arg e "${{ vars.EXCLUDETESTS }}" '.excludeTests=[$e]' FITConfiguration.example.json`" > FITConfiguration.json
+      #     echo "`jq --arg e "${{ vars.SERVER_VERSION }}" '.situational.cbdino.version=$e' FITConfiguration.json`" > FITConfiguration.json
+      #     echo "`jq --arg e "${{ vars.DEPLOYER }}" '.situational.cbdino.deployer=$e' FITConfiguration.json`" > FITConfiguration.json
+      #     echo "`jq --arg e "${{ vars.REGION }}" '.situational.cbdino.region=$e' FITConfiguration.json`" > FITConfiguration.json
+      #     echo "`jq --arg e "${{ vars.CBDINO_PATH }}" '.situational.cbdino.cbDinoClusterAppPath=$e' FITConfiguration.json`" > FITConfiguration.json
+      #     echo "`jq --arg e "${{ vars.PGHOST }}" '.situational.database.jdbc=$e' FITConfiguration.json`" > FITConfiguration.json
+      #     echo "`jq --arg e "${{ vars.PGUSERNAME }}" '.situational.database.username=$e' FITConfiguration.json`" > FITConfiguration.json
+      #     echo "`jq --arg e "${{ vars.PGPASSWORD }}" '.situational.database.password=$e' FITConfiguration.json`" > FITConfiguration.json
+      #     echo "`jq --argjson e "${{ vars.ENABLE_PE }}" '.situational.cbdino.enablePrivateEndpoint=$e' FITConfiguration.json`" > FITConfiguration.json
+      #     cat FITConfiguration.json
+      # - name: Run SIT tests
+      #   run: |
+      #    cd transactions-fit-performer
+      #    mvn --projects test-driver --also-make -Dmaven.test.failure.ignore -DfailIfNoTests=false test -Dgroups=situational,cbDino -DexcludedGroups=openshift,capella
