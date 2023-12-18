@@ -1,2 +1,2 @@
 # fit-app-deployment
-Run FIT with Github actions
+Run FITSIT with Github actions
