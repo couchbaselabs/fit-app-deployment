@@ -55,7 +55,7 @@ jobs:
               ./cbdinocluster-linux init --auto
               ;;
             (*)
-              echo -e "n\nn\Yn\nY\nn" | ./cbdinocluster-linux init --aws-region "us-west-2" --capella-endpoint ${{ vars.CAP_END_POINT }} --capella-oid ${{ vars.CAP_OID }} --capella-user ${{ vars.CAP_USER }} --capella-pass ${{ vars.CAP_PASS }}
+              ./cbdinocluster-linux init --auto --capella-endpoint ${{ vars.CAP_END_POINT }} --capella-oid ${{ vars.CAP_OID }} --capella-user ${{ vars.CAP_USER }} --capella-pass ${{ vars.CAP_PASS }}
               ;;
           esac
           cat ~/.cbdinocluster
