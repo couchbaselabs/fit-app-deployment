@@ -59,13 +59,11 @@ jobs:
               ;;
           esac
           cat ~/.cbdinocluster
-      - name: clone and setup fit
+      - name: clone fit and build gRPC
         run: |
           git clone git@github.com:couchbaselabs/transactions-fit-performer.git
           cd transactions-fit-performer/gRPC/jvm
           mvn clean install
-          cd ../..
-          docker build --no-cache -f test-driver/Dockerfile -t fit/test-driver:latest .
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
       - name: start ${{ vars.PERFORMER }}  performer
@@ -86,6 +84,10 @@ jobs:
           echo "`jq --arg e "${{ vars.PGPASSWORD }}" '.situational.database.password=$e' FITConfiguration.json`" > FITConfiguration.json
           echo "`jq --argjson e "${{ vars.ENABLE_PE }}" '.situational.cbdino.enablePrivateEndpoint=$e' FITConfiguration.json`" > FITConfiguration.json
           cat FITConfiguration.json
+      - name: build driver docker image
+        run: |
+          cd transactions-fit-performer
+          docker build --no-cache -f test-driver/Dockerfile -t fit/test-driver:latest .
       - name: Run SIT tests
         run: |
          cd transactions-fit-performer
