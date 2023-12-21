@@ -32,7 +32,14 @@ jobs:
       - name: clone and setup couchbase jvm client 
         run: |
           git clone git@github.com:couchbase/couchbase-jvm-clients.git
-          cd couchbase-jvm-clients
+          case "${{ vars.PERFORMER }}" in
+            ("dotnet")
+              git clone git@github.com:couchbase/couchbase-net-client.git
+              ;;
+            (*)
+              echo "We are good here"
+              ;;
+          esac
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
       - name: clone jenkins sdk repo
@@ -62,6 +69,19 @@ jobs:
       - name: clone fit and build gRPC
         run: |
           git clone git@github.com:couchbaselabs/transactions-fit-performer.git
+          case "${{ vars.PERFORMER }}" in
+            ("dotnet")
+              git submodule init
+              git submodule update --init --force --remote 
+              ;;
+            ("cpp")
+              git submodule init
+              git submodule update --init --force --remote 
+              ;;
+            (*)
+              echo "We are good for this"
+              ;;
+          esac
           cd transactions-fit-performer/gRPC/jvm
           mvn clean install
         env:
