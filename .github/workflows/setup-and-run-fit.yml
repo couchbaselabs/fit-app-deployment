@@ -69,7 +69,14 @@ jobs:
       - name: start ${{ vars.PERFORMER }}  performer
         run: |
           cd jenkins-sdk
-          ./gradlew buildPerformer --args="-d ../ -i ${{ vars.PERFORMER }}-performer -s ${{ vars.PERFORMER }}"
+          case "${{ vars.PERFORMER }}" in
+            ("dotnet")
+              ./gradlew buildPerformer --args="-d ../ -s ${{ vars.PERFORMER }} -i performer --build-validation=auto" 
+              ;;
+            (*)
+              ./gradlew buildPerformer --args="-d ../ -i ${{ vars.PERFORMER }}-performer -s ${{ vars.PERFORMER }}"
+              ;;
+          esac
           docker run --network=fit -d -p 8060:8060 ${{ vars.PERFORMER }}-performer
       - name: Edit values from the FITConfiguration.json
         run: |
