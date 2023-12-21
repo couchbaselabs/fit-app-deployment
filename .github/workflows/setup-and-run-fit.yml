@@ -29,6 +29,13 @@ jobs:
           mvn -version
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+      - name: install dotnet
+        run: |
+          sudo apt-get update
+          sudo apt install dotnet-sdk-8.0
+          dotnet --info
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
       - name: clone and setup couchbase jvm client 
         run: |
           git clone git@github.com:couchbase/couchbase-jvm-clients.git
