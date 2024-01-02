@@ -104,7 +104,7 @@ jobs:
           cd jenkins-sdk
           case "${{ vars.PERFORMER }}" in
             ("dotnet")
-              ./gradlew buildPerformer --args="-d ../ -s ${{ vars.PERFORMER }} -i performer -v 3.4.14-rc1" 
+              ./gradlew buildPerformer --args="-d ../ -s ${{ vars.PERFORMER }} -i ${{ vars.PERFORMER }}-performer -v 3.4.14-rc1" 
               ;;
             (*)
               ./gradlew buildPerformer --args="-d ../ -i ${{ vars.PERFORMER }}-performer -s ${{ vars.PERFORMER }}"
