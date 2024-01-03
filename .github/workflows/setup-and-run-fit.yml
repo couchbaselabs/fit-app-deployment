@@ -106,7 +106,7 @@ jobs:
               ./gradlew buildPerformer --args="-d ../ -i ${{ vars.PERFORMER }}-performer -s ${{ vars.PERFORMER }}"
               ;;
           esac
-          docker run --network=fit -d -p 8060:8060 ${{ vars.PERFORMER }}-performer
+          docker run --network=fit -d --name ${{ vars.PERFORMER }}-performer-container -p 8060:8060 ${{ vars.PERFORMER }}-performer
       # - name: Edit values from the FITConfiguration.json
       #   run: |
       #     cd transactions-fit-performer/test-driver
@@ -130,7 +130,7 @@ jobs:
       #    mvn --projects test-driver --also-make -Dmaven.test.failure.ignore -DfailIfNoTests=false test -Dgroups=situational,cbDino -DexcludedGroups=openshift,capella
       - name: Capture ${{ vars.PERFORMER }} performer logs
         run: |
-         docker logs ${{ vars.PERFORMER }}-performer > ${{ vars.PERFORMER }}-performer_logs.txt
+         docker logs ${{ vars.PERFORMER }}-performer-container > ${{ vars.PERFORMER }}-performer_logs.txt
       - name: Upload ${{ vars.PERFORMER }} performer logs to GitHub Artifacts
         uses: actions/upload-artifact@v2
         with:
