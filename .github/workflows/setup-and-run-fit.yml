@@ -130,9 +130,4 @@ jobs:
       #    mvn --projects test-driver --also-make -Dmaven.test.failure.ignore -DfailIfNoTests=false test -Dgroups=situational,cbDino -DexcludedGroups=openshift,capella
       - name: Capture ${{ vars.PERFORMER }} performer logs
         run: |
-         docker logs ${{ vars.PERFORMER }}-performer-container > ${{ vars.PERFORMER }}-performer_logs.txt
-      - name: Upload ${{ vars.PERFORMER }} performer logs to GitHub Artifacts
-        uses: actions/upload-artifact@v2
-        with:
-          name: docker-logs
-          path: ${{ vars.PERFORMER }}-performer_logs.txt    
+         docker logs ${{ vars.PERFORMER }}-performer-container
