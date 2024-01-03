@@ -27,8 +27,6 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y maven
           mvn -version
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
       - name: install dotnet
         run: |
           sudo apt-get install -y gpg
@@ -40,8 +38,6 @@ jobs:
           sudo chown root:root /etc/apt/sources.list.d/microsoft-prod.list
           sudo apt-get update && \
             sudo apt-get install -y aspnetcore-runtime-8.0
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
       - name: clone and setup couchbase jvm client 
         run: |
           git clone git@github.com:couchbase/couchbase-jvm-clients.git
@@ -110,7 +106,7 @@ jobs:
               ./gradlew buildPerformer --args="-d ../ -i ${{ vars.PERFORMER }}-performer -s ${{ vars.PERFORMER }}"
               ;;
           esac
-          docker run --network=fit -d -p 8060:8060 ${{ vars.PERFORMER }}-performer
+          docker run --network=fit -d --name ${{ vars.PERFORMER }}-performer-container -p 8060:8060 ${{ vars.PERFORMER }}-performer
       - name: Edit values from the FITConfiguration.json
         run: |
           cd transactions-fit-performer/test-driver
@@ -132,3 +128,6 @@ jobs:
         run: |
          cd transactions-fit-performer
          mvn --projects test-driver --also-make -Dmaven.test.failure.ignore -DfailIfNoTests=false test -Dgroups=situational,cbDino -DexcludedGroups=openshift,capella
+      - name: Capture ${{ vars.PERFORMER }} performer logs
+        run: |
+         docker logs ${{ vars.PERFORMER }}-performer-container
