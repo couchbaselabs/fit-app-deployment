@@ -1,6 +1,28 @@
 name: Run SIT tests with private endpoints
 run-name: ${{ github.actor }} Run SIT tests with private endpoints
-on: workflow_dispatch
+on: 
+  workflow_dispatch:
+    inputs:
+      sdk:
+        description: SDK Performer to use
+        type: choice
+        options:
+        - "java"
+        - "go"
+        - ".net"
+        - "c++"
+        - "node"
+        - "python"
+        - "ruby"
+        - "scala"
+        - "kotlin"
+        - "php"
+      private-endpoints:
+        description: Run the tests with private endpoints
+        type: choice
+        options:
+        - "true"
+        - "false"
 jobs:
   build:
     name: Build
@@ -42,7 +64,7 @@ jobs:
       - name: clone and setup couchbase jvm client 
         run: |
           git clone git@github.com:couchbase/couchbase-jvm-clients.git
-          case "${{ vars.PERFORMER }}" in
+          case "${{ github.event.inputs.sdk }}" in
             ("dotnet")
               git clone git@github.com:couchbase/couchbase-net-client.git
               ;;
@@ -79,7 +101,7 @@ jobs:
       - name: clone fit and build gRPC
         run: |
           git clone git@github.com:couchbaselabs/transactions-fit-performer.git
-          case "${{ vars.PERFORMER }}" in
+          case "${{ github.event.inputs.sdk }}" in
             ("dotnet")
               git submodule init
               git submodule update --init --force --remote 
@@ -96,18 +118,18 @@ jobs:
           mvn clean install
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-      - name: start ${{ vars.PERFORMER }}  performer
+      - name: start ${{ github.event.inputs.sdk }}  performer
         run: |
           cd jenkins-sdk
-          case "${{ vars.PERFORMER }}" in
+          case "${{ github.event.inputs.sdk }}" in
             ("dotnet")
-              ./gradlew buildPerformer --args="-d ../ -s ${{ vars.PERFORMER }} -i ${{ vars.PERFORMER }}-performer -v 3.4.14-rc1" 
+              ./gradlew buildPerformer --args="-d ../ -s ${{ github.event.inputs.sdk }} -i ${{ github.event.inputs.sdk }}-performer -v 3.4.14-rc1" 
               ;;
             (*)
-              ./gradlew buildPerformer --args="-d ../ -i ${{ vars.PERFORMER }}-performer -s ${{ vars.PERFORMER }}"
+              ./gradlew buildPerformer --args="-d ../ -i ${{ github.event.inputs.sdk }}-performer -s ${{ github.event.inputs.sdk }}"
               ;;
           esac
-          docker run --network=fit -d --name ${{ vars.PERFORMER }}-performer-container -p 8060:8060 ${{ vars.PERFORMER }}-performer
+          docker run --network=fit -d --name ${{ github.event.inputs.sdk }}-performer-container -p 8060:8060 ${{ github.event.inputs.sdk }}-performer
       - name: Edit values from the FITConfiguration.json
         run: |
           cd transactions-fit-performer/test-driver
@@ -119,7 +141,7 @@ jobs:
           echo "`jq --arg e "${{ vars.PGHOST }}" '.situational.database.jdbc=$e' FITConfiguration.json`" > FITConfiguration.json
           echo "`jq --arg e "${{ vars.PGUSERNAME }}" '.situational.database.username=$e' FITConfiguration.json`" > FITConfiguration.json
           echo "`jq --arg e "${{ vars.PGPASSWORD }}" '.situational.database.password=$e' FITConfiguration.json`" > FITConfiguration.json
-          echo "`jq --argjson e "${{ vars.ENABLE_PE }}" '.situational.cbdino.enablePrivateEndpoint=$e' FITConfiguration.json`" > FITConfiguration.json
+          echo "`jq --argjson e "${{ github.event.inputs.private-endpoints }}" '.situational.cbdino.enablePrivateEndpoint=$e' FITConfiguration.json`" > FITConfiguration.json
           cat FITConfiguration.json
       - name: build driver docker image
         run: |
@@ -129,6 +151,6 @@ jobs:
         run: |
          cd transactions-fit-performer
          mvn --projects test-driver --also-make -Dmaven.test.failure.ignore -DfailIfNoTests=false -Dtest=${{ vars.FAILED_TESTS }} test -Dgroups=situational,cbDino -DexcludedGroups=openshift,capella
-      - name: Capture ${{ vars.PERFORMER }} performer logs
+      - name: Capture ${{ github.event.inputs.sdk }} performer logs
         run: |
-         docker logs ${{ vars.PERFORMER }}-performer-container
+         docker logs ${{ github.event.inputs.sdk }}-performer-container
