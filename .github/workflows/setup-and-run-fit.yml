@@ -3,6 +3,8 @@ run-name: ${{ github.actor }} Run SIT tests with private endpoints
 on: 
   workflow_dispatch:
     inputs:
+      environment:
+        type: environment
       sdk:
         description: SDK Performer to use
         type: choice
@@ -23,13 +25,21 @@ on:
         options:
         - "true"
         - "false"
+      server-version:
+        description: The server version to use on Capella (defaults only currrently, no specific images)
+        type: choice
+        options:
+        - "7.2"
+        - "7.6"
 jobs:
   build:
     name: Build
     runs-on: [self-hosted, aws]
     environment:
-      name: env
+      name: ${{ github.event.inputs.environment }}
     steps:
+      - name: Run params
+        run: echo "${{ toJSON(github.event.inputs) }}"
       - uses: actions/checkout@v3
       - name: Set up Maven Central Repository
         uses: actions/setup-java@v3
@@ -134,13 +144,13 @@ jobs:
         run: |
           cd transactions-fit-performer/test-driver
           echo "`jq --arg e "${{ vars.EXCLUDETESTS }}" '.excludeTests=[$e]' FITConfiguration.example.json`" > FITConfiguration.json
-          echo "`jq --arg e "${{ vars.SERVER_VERSION }}" '.situational.cbdino.version=$e' FITConfiguration.json`" > FITConfiguration.json
+          echo "`jq --arg e "${{ github.event.inputs.server-version }}" '.situational.cbdino.version=$e' FITConfiguration.json`" > FITConfiguration.json
           echo "`jq --arg e "${{ vars.DEPLOYER }}" '.situational.cbdino.deployer=$e' FITConfiguration.json`" > FITConfiguration.json
           echo "`jq --arg e "${{ vars.REGION }}" '.situational.cbdino.region=$e' FITConfiguration.json`" > FITConfiguration.json
           echo "`jq --arg e "${{ vars.CBDINO_PATH }}" '.situational.cbdino.cbDinoClusterAppPath=$e' FITConfiguration.json`" > FITConfiguration.json
           echo "`jq --arg e "${{ vars.PGHOST }}" '.situational.database.jdbc=$e' FITConfiguration.json`" > FITConfiguration.json
           echo "`jq --arg e "${{ vars.PGUSERNAME }}" '.situational.database.username=$e' FITConfiguration.json`" > FITConfiguration.json
-          echo "`jq --arg e "${{ vars.PGPASSWORD }}" '.situational.database.password=$e' FITConfiguration.json`" > FITConfiguration.json
+          echo "`jq --arg e "${{ secrets.PG_PASSWORD }}" '.situational.database.password=$e' FITConfiguration.json`" > FITConfiguration.json
           echo "`jq --argjson e "${{ github.event.inputs.private-endpoints }}" '.situational.cbdino.enablePrivateEndpoint=$e' FITConfiguration.json`" > FITConfiguration.json
           cat FITConfiguration.json
       - name: build driver docker image
