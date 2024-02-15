@@ -112,15 +112,12 @@ jobs:
           chmod 744 ./cbdinocluster-linux
           pwd
       - name: init cbdino cluster for ${{ vars.DEPLOYER }}
+        env:
+          CAPELLA_ENDPOINT: ${{ inputs.sbx-id || vars.CAP_END_POINT }}
+          CAPELLA_OID: ${{ inputs.sbx-org-id || vars.CAP_OID }}
+          CAPELLA_USER: ${{ inputs.sbx-user || vars.CAP_USER }}
+          CAPELLA_PASS: ${{ inputs.sbx-password || vars.CAP_PASS }}
         run: |
-          CAPELLA_ENDPOINT=${{ inputs.sbx-id || vars.CAP_END_POINT }}
-          CAPELLA_OID=${{ inputs.sbx-org-id || vars.CAP_OID }}
-          CAPELLA_USER=${{ inputs.sbx-user || vars.CAP_USER }}
-          CAPELLA_PASS=${{ inputs.sbx-password || vars.CAP_PASS }}
-          echo $CAPELLA_ENDPOINT
-          echo $CAPELLA_OID
-          echo $CAPELLA_USER
-          echo $CAPELLA_PASS
           ./cbdinocluster-linux init --auto
           cat ~/.cbdinocluster
       - name: clone fit and build gRPC
