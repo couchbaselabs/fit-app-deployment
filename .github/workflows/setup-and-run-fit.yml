@@ -116,7 +116,7 @@ jobs:
           pwd
       - name: init cbdino cluster for ${{ vars.DEPLOYER }}
         env:
-          CAPELLA_ENDPOINT: ${{ inputs.sbx-id || vars.CAP_END_POINT }}
+          CAPELLA_ENDPOINT: ${{ inputs.sbx-id-api || vars.CAP_END_POINT }}
           CAPELLA_OID: ${{ inputs.sbx-org-id || vars.CAP_OID }}
           CAPELLA_USER: ${{ inputs.sbx-user || vars.CAP_USER }}
           CAPELLA_PASS: ${{ inputs.sbx-password || vars.CAP_PASS }}
