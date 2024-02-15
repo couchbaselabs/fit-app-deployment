@@ -55,7 +55,7 @@ jobs:
         run: |
           echo "${{ toJSON(github.event.inputs) }}"
           CAPELLA_ENDPOINT: ${{ inputs.sbx-id || vars.CAP_END_POINT }} >> $GITHUB_ENV
-          echo CAPELLA_ENDPOINT
+          echo $CAPELLA_ENDPOINT
 
           echo ${{ vars.CAP_END_POINT }} 
           echo ${{ vars.CAP_OID }} 
