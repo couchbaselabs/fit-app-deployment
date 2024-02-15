@@ -55,12 +55,13 @@ jobs:
         run: |
           echo "${{ toJSON(github.event.inputs) }}"
           CAPELLA_ENDPOINT=${{ inputs.sbx-id || vars.CAP_END_POINT }}
+          CAPELLA_OID=${{ inputs.sbx-id || vars.CAP_OID }}
+          CAPELLA_USER=${{ inputs.sbx-id || vars.CAP_USER }}
+          CAPELLA_PASS=${{ inputs.sbx-id || vars.CAP_PASS }}
           echo $CAPELLA_ENDPOINT
-
-          echo ${{ vars.CAP_END_POINT }} 
-          echo ${{ vars.CAP_OID }} 
-          echo ${{ vars.CAP_USER }} 
-          echo ${{ vars.CAP_PASS }}
+          echo $CAPELLA_OID
+          echo $CAPELLA_USER
+          echo $CAPELLA_PASS
       - uses: actions/checkout@v3
       - name: Set up Maven Central Repository
         uses: actions/setup-java@v3
@@ -120,14 +121,7 @@ jobs:
           pwd
       - name: init cbdino cluster for ${{ vars.DEPLOYER }}
         run: |
-          case "${{ vars.DEPLOYER }}" in
-            ("docker")
-              ./cbdinocluster-linux init --auto
-              ;;
-            (*)
-              echo -e "n\nn\Yn\nY\nn" | ./cbdinocluster-linux init --aws-region "us-west-2" --capella-endpoint ${{ vars.CAP_END_POINT }} --capella-oid ${{ vars.CAP_OID }} --capella-user ${{ vars.CAP_USER }} --capella-pass ${{ vars.CAP_PASS }}
-              ;;
-          esac
+          ./cbdinocluster-linux init --auto
           cat ~/.cbdinocluster
       - name: clone fit and build gRPC
         run: |
