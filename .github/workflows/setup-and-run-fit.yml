@@ -34,8 +34,8 @@ on:
       run-specific-test:
         description: Target a specific test to run (i.e. CbDinoTest#rebalance3To5NodesMixedKvAndQuery)
         type: string
-      sbx-id:
-        description: The sandbox id (i.e. sbx-10) iff using the sbx environment 
+      sbx-id-api:
+        description: The sandbox api (i.e. https://api.sbx-10.sandbox.nonprod-project-avengers.com) iff using the sbx environment 
         type: string
       sbx-org-id:
         description: The sandbox organisation id to deploy to
@@ -116,7 +116,7 @@ jobs:
           pwd
       - name: init cbdino cluster for ${{ vars.DEPLOYER }}
         env:
-          CAPELLA_ENDPOINT: ${{ "https://api." + inputs.sbx-id + ".sandbox.nonprod-project-avengers.com" || vars.CAP_END_POINT }}
+          CAPELLA_ENDPOINT: ${{ inputs.sbx-id || vars.CAP_END_POINT }}
           CAPELLA_OID: ${{ inputs.sbx-org-id || vars.CAP_OID }}
           CAPELLA_USER: ${{ inputs.sbx-user || vars.CAP_USER }}
           CAPELLA_PASS: ${{ inputs.sbx-password || vars.CAP_PASS }}
