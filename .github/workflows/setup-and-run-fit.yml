@@ -31,6 +31,22 @@ on:
         options:
         - "7.2"
         - "7.6"
+      run-specific-test:
+        description: Target a specific test to run (i.e. CbDinoTest#rebalance3To5NodesMixedKvAndQuery)
+        type: string
+      sbx-id-api:
+        description: The sandbox api (i.e. https://api.sbx-10.sandbox.nonprod-project-avengers.com) iff using the sbx environment 
+        type: string
+      sbx-org-id:
+        description: The sandbox organisation id to deploy to
+        type: string
+      sbx-user:
+        description: The user for the given sandbox (must already be created)
+        type: string
+      sbx-password:
+        description: The user password for the given sandbox (must already be created)
+        type: string
+
 jobs:
   build:
     name: Build
@@ -38,8 +54,9 @@ jobs:
     environment:
       name: ${{ github.event.inputs.environment }}
     steps:
-      - name: Run params
-        run: echo "${{ toJSON(github.event.inputs) }}"
+      - name: Parameters being used in the run
+        run: |
+          echo "${{ toJSON(github.event.inputs) }}"
       - uses: actions/checkout@v3
       - name: Set up Maven Central Repository
         uses: actions/setup-java@v3
@@ -98,15 +115,13 @@ jobs:
           chmod 744 ./cbdinocluster-linux
           pwd
       - name: init cbdino cluster for ${{ vars.DEPLOYER }}
+        env:
+          CAPELLA_ENDPOINT: ${{ inputs.sbx-id-api || vars.CAP_END_POINT }}
+          CAPELLA_OID: ${{ inputs.sbx-org-id || vars.CAP_OID }}
+          CAPELLA_USER: ${{ inputs.sbx-user || vars.CAP_USER }}
+          CAPELLA_PASS: ${{ inputs.sbx-password || vars.CAP_PASS }}
         run: |
-          case "${{ vars.DEPLOYER }}" in
-            ("docker")
-              ./cbdinocluster-linux init --auto
-              ;;
-            (*)
-              echo -e "n\nn\Yn\nY\nn" | ./cbdinocluster-linux init --aws-region "us-west-2" --capella-endpoint ${{ vars.CAP_END_POINT }} --capella-oid ${{ vars.CAP_OID }} --capella-user ${{ vars.CAP_USER }} --capella-pass ${{ vars.CAP_PASS }}
-              ;;
-          esac
+          ./cbdinocluster-linux init --auto
           cat ~/.cbdinocluster
       - name: clone fit and build gRPC
         run: |
@@ -160,7 +175,7 @@ jobs:
       - name: Run SIT tests
         run: |
          cd transactions-fit-performer
-         mvn --projects test-driver --also-make -Dmaven.test.failure.ignore -DfailIfNoTests=false -Dtest=${{ vars.FAILED_TESTS }} test -Dgroups=situational,cbDino -DexcludedGroups=openshift,capella
+         mvn -B --projects test-driver --also-make -Dmaven.test.failure.ignore -DfailIfNoTests=false -Dtest=${{ github.event.inputs.run-specific-test }} test -Dgroups=situational,cbDino -DexcludedGroups=openshift,capella
       - name: Capture ${{ github.event.inputs.sdk }} performer logs
         run: |
          docker logs ${{ github.event.inputs.sdk }}-performer-container
