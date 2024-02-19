@@ -26,9 +26,6 @@ on:
         - "AWS"
         - "Azure"
         - "GCP"
-      cloud-region:
-        description: The region to deploy the cluster to (if empty will use appropriate default that works with PE testing)
-        type: string
       private-endpoints:
         description: Run the tests with private endpoints
         type: choice
