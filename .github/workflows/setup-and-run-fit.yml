@@ -19,6 +19,16 @@ on:
         - "scala"
         - "kotlin"
         - "php"
+      cloud:
+        description: The Cloud service provider
+        type: choice
+        options:
+        - "AWS"
+        - "Azure"
+        - "GCP"
+      cloud-region:
+        description: The region to deploy the cluster to (if empty will use appropriate default that works with PE testing)
+        type: string
       private-endpoints:
         description: Run the tests with private endpoints
         type: choice
@@ -160,8 +170,8 @@ jobs:
           cd transactions-fit-performer/test-driver
           echo "`jq --arg e "${{ vars.EXCLUDETESTS }}" '.excludeTests=[$e]' FITConfiguration.example.json`" > FITConfiguration.json
           echo "`jq --arg e "${{ github.event.inputs.server-version }}" '.situational.cbdino.version=$e' FITConfiguration.json`" > FITConfiguration.json
-          echo "`jq --arg e "${{ vars.DEPLOYER }}" '.situational.cbdino.deployer=$e' FITConfiguration.json`" > FITConfiguration.json
-          echo "`jq --arg e "${{ vars.REGION }}" '.situational.cbdino.region=$e' FITConfiguration.json`" > FITConfiguration.json
+          echo "`jq --arg e "${{ github.event.inputs.cloud }}" '.situational.cbdino.deployer=$e' FITConfiguration.json`" > FITConfiguration.json
+          echo "`jq --arg e "${{ github.event.inputs.cloud-region }}" '.situational.cbdino.region=$e' FITConfiguration.json`" > FITConfiguration.json
           echo "`jq --arg e "${{ vars.CBDINO_PATH }}" '.situational.cbdino.cbDinoClusterAppPath=$e' FITConfiguration.json`" > FITConfiguration.json
           echo "`jq --arg e "${{ vars.PGHOST }}" '.situational.database.jdbc=$e' FITConfiguration.json`" > FITConfiguration.json
           echo "`jq --arg e "${{ vars.PGUSERNAME }}" '.situational.database.username=$e' FITConfiguration.json`" > FITConfiguration.json
