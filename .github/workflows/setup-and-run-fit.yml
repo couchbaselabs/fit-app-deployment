@@ -168,7 +168,7 @@ jobs:
           echo "`jq --arg e "${{ vars.EXCLUDETESTS }}" '.excludeTests=[$e]' FITConfiguration.example.json`" > FITConfiguration.json
           echo "`jq --arg e "${{ github.event.inputs.server-version }}" '.situational.cbdino.version=$e' FITConfiguration.json`" > FITConfiguration.json
           echo "`jq --arg e "${{ github.event.inputs.cloud }}" '.situational.cbdino.deployer=$e' FITConfiguration.json`" > FITConfiguration.json
-          echo "`jq --arg e "${{ github.event.inputs.cloud-region }}" '.situational.cbdino.region=$e' FITConfiguration.json`" > FITConfiguration.json
+          echo "`jq --arg e "" '.situational.cbdino.region=$e' FITConfiguration.json`" > FITConfiguration.json
           echo "`jq --arg e "${{ vars.CBDINO_PATH }}" '.situational.cbdino.cbDinoClusterAppPath=$e' FITConfiguration.json`" > FITConfiguration.json
           echo "`jq --arg e "${{ vars.PGHOST }}" '.situational.database.jdbc=$e' FITConfiguration.json`" > FITConfiguration.json
           echo "`jq --arg e "${{ vars.PGUSERNAME }}" '.situational.database.username=$e' FITConfiguration.json`" > FITConfiguration.json
