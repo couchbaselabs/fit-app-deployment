@@ -57,7 +57,7 @@ on:
 jobs:
   build:
     name: Build
-    runs-on: [self-hosted, aws]
+    runs-on: [self-hosted, azure]
     environment:
       name: ${{ github.event.inputs.environment }}
     steps:
