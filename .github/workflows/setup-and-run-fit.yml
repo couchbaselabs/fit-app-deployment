@@ -23,9 +23,8 @@ on:
         description: The Cloud service provider
         type: choice
         options:
-        - "AWS"
-        - "Azure"
-        - "GCP"
+        - "aws"
+        - "azure"
       private-endpoints:
         description: Run the tests with private endpoints
         type: choice
@@ -57,7 +56,7 @@ on:
 jobs:
   build:
     name: Build
-    runs-on: [self-hosted, azure]
+    runs-on: [self-hosted, "${{ github.event.inputs.cloud }}"]
     environment:
       name: ${{ github.event.inputs.environment }}
     steps:
