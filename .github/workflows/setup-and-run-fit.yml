@@ -11,7 +11,7 @@ on:
         options:
         - "java"
         - "go"
-        - ".net"
+        - "dotnet"
         - "c++"
         - "node"
         - "python"
