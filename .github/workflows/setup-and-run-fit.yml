@@ -12,7 +12,7 @@ on:
         - "java"
         - "go"
         - ".net"
-        - "c++"
+        - "cxx"
         - "node"
         - "python"
         - "ruby"
