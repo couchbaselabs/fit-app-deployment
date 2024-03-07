@@ -77,23 +77,6 @@ jobs:
         with:
             host: github.com
             private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-      - name: install maven
-        run: |
-          sudo rm /var/lib/dpkg/lock-frontend
-          sudo apt-get update
-          sudo apt-get install -y maven
-          mvn -version
-      - name: install dotnet
-        run: |
-          sudo apt-get install -y gpg
-          wget -O - https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor -o microsoft.asc.gpg
-          sudo mv microsoft.asc.gpg /etc/apt/trusted.gpg.d/
-          wget https://packages.microsoft.com/config/ubuntu/22.04/prod.list
-          sudo mv prod.list /etc/apt/sources.list.d/microsoft-prod.list
-          sudo chown root:root /etc/apt/trusted.gpg.d/microsoft.asc.gpg
-          sudo chown root:root /etc/apt/sources.list.d/microsoft-prod.list
-          sudo apt-get update && \
-            sudo apt-get install -y aspnetcore-runtime-8.0
       - name: clone and setup couchbase jvm client 
         run: |
           git clone git@github.com:couchbase/couchbase-jvm-clients.git
@@ -152,14 +135,7 @@ jobs:
       - name: start ${{ github.event.inputs.sdk }}  performer
         run: |
           cd jenkins-sdk
-          case "${{ github.event.inputs.sdk }}" in
-            ("dotnet")
-              ./gradlew buildPerformer --args="-d ../ -s ${{ github.event.inputs.sdk }} -i ${{ github.event.inputs.sdk }}-performer -v 3.4.14-rc1" 
-              ;;
-            (*)
-              ./gradlew buildPerformer --args="-d ../ -i ${{ github.event.inputs.sdk }}-performer -s ${{ github.event.inputs.sdk }}"
-              ;;
-          esac
+          ./gradlew buildPerformer --args="-d ../ -i ${{ github.event.inputs.sdk }}-performer -s ${{ github.event.inputs.sdk }}"
           docker run --network=fit -d --name ${{ github.event.inputs.sdk }}-performer-container -p 8060:8060 ${{ github.event.inputs.sdk }}-performer
       - name: Edit values from the FITConfiguration.json
         run: |
