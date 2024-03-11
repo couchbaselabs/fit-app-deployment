@@ -130,6 +130,8 @@ jobs:
             ("dotnet")
               git submodule init
               git submodule update --init --force --remote 
+              sed -i 's/kvAndQuery(r/kvGetsAndInserts(r/g' transactions-fit-performer/test-driver/src/test/scala/com/couchbase/situational/tests/CbDinoTest.scala
+              cat transactions-fit-performer/test-driver/src/test/scala/com/couchbase/situational/tests/CbDinoTest.scala
               ;;
             ("cpp")
               git submodule init
