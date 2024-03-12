@@ -159,5 +159,6 @@ jobs:
          cd transactions-fit-performer
          mvn -B --projects test-driver --also-make -Dmaven.test.failure.ignore -DfailIfNoTests=false -Dtest=${{ github.event.inputs.run-specific-test }} test -Dgroups=situational,cbDino -DexcludedGroups=openshift,capella
       - name: Capture ${{ github.event.inputs.sdk }} performer logs
+        if: always()
         run: |
          docker logs ${{ github.event.inputs.sdk }}-performer-container
