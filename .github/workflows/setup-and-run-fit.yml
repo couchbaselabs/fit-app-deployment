@@ -126,9 +126,6 @@ jobs:
       - name: clone fit and build gRPC
         run: |
           git clone git@github.com:couchbaselabs/transactions-fit-performer.git
-          
-          cd transactions-fit-performer && git fetch ssh://review.couchbase.org:29418/transactions-fit-performer refs/changes/64/207264/1 && git checkout FETCH_HEAD
-          cd ..
           case "${{ github.event.inputs.sdk }}" in
             ("dotnet")
               git submodule init
@@ -151,7 +148,7 @@ jobs:
       - name: start ${{ github.event.inputs.sdk }}  performer
         run: |
           cd jenkins-sdk
-          ./gradlew buildPerformer --args="-d ../ -i ${{ github.event.inputs.sdk }}-performer -s ${{ github.event.inputs.sdk }} -v 3.4.15"
+          ./gradlew buildPerformer --args="-d ../ -i ${{ github.event.inputs.sdk }}-performer -s ${{ github.event.inputs.sdk }}"
           docker run --network=fit -d --name ${{ github.event.inputs.sdk }}-performer-container -p 8060:8060 ${{ github.event.inputs.sdk }}-performer
       - name: Edit values from the FITConfiguration.json
         run: |
