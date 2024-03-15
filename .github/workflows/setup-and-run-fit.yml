@@ -126,7 +126,8 @@ jobs:
       - name: clone fit and build gRPC
         run: |
           git clone git@github.com:couchbaselabs/transactions-fit-performer.git
-          cd transactions-fit-performer && git fetch "http://willbroadbelt@review.couchbase.org/couchbase-net-client" refs/changes/64/207264/1 && git checkout FETCH_HEAD
+          
+          cd transactions-fit-performer && git fetch ssh://review.couchbase.org:29418/transactions-fit-performer refs/changes/64/207264/1 && git checkout FETCH_HEAD
           cd ..
           case "${{ github.event.inputs.sdk }}" in
             ("dotnet")
