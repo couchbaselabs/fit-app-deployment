@@ -11,7 +11,7 @@ on:
         options:
         - "java"
         - "go"
-        - ".net"
+        - "dotnet"
         - "cxx"
         - "node"
         - "python"
@@ -130,6 +130,8 @@ jobs:
             ("dotnet")
               git submodule init
               git submodule update --init --force --remote 
+              sed -i 's/kvAndQuery(r/kvGetsAndInserts(r/g' transactions-fit-performer/test-driver/src/test/scala/com/couchbase/situational/tests/CbDinoTest.scala
+              cat transactions-fit-performer/test-driver/src/test/scala/com/couchbase/situational/tests/CbDinoTest.scala
               ;;
             ("cpp")
               git submodule init
@@ -146,14 +148,7 @@ jobs:
       - name: start ${{ github.event.inputs.sdk }}  performer
         run: |
           cd jenkins-sdk
-          case "${{ github.event.inputs.sdk }}" in
-            ("dotnet")
-              ./gradlew buildPerformer --args="-d ../ -s ${{ github.event.inputs.sdk }} -i ${{ github.event.inputs.sdk }}-performer -v 3.4.14-rc1" 
-              ;;
-            (*)
-              ./gradlew buildPerformer --args="-d ../ -i ${{ github.event.inputs.sdk }}-performer -s ${{ github.event.inputs.sdk }}"
-              ;;
-          esac
+          ./gradlew buildPerformer --args="-d ../ -i ${{ github.event.inputs.sdk }}-performer -s ${{ github.event.inputs.sdk }}"
           docker run --network=fit -d --name ${{ github.event.inputs.sdk }}-performer-container -p 8060:8060 ${{ github.event.inputs.sdk }}-performer
       - name: Edit values from the FITConfiguration.json
         run: |
