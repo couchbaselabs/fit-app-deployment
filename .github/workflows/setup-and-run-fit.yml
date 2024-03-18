@@ -121,10 +121,10 @@ jobs:
               git submodule update --init --force --remote
               sed -i 's/kvAndQuery(r/kvGetsAndInserts(r/g' transactions-fit-performer/test-driver/src/test/scala/com/couchbase/situational/tests/CbDinoTest.scala
               cat transactions-fit-performer/test-driver/src/test/scala/com/couchbase/situational/tests/CbDinoTest.scala
-              cd transactions-fit-performer/performers/dotnet/couchbase-net-client
+              cd transactions-fit-performer/performers/dotnet/couchbase-net-client && git fetch "http://willbroadbelt@review.couchbase.org/couchbase-net-client" refs/changes/80/207280/1 && git checkout FETCH_HEAD
               pwd
-              git fetch "http://willbroadbelt@review.couchbase.org/couchbase-net-client" refs/changes/80/207280/1 && git checkout FETCH_HEAD
               cd ../../../..
+              pwd
               ;;
             ("cpp")
               git submodule init
