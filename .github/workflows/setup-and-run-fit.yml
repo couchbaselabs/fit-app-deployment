@@ -130,6 +130,10 @@ jobs:
             ("dotnet")
               git submodule init
               git submodule update --init --force --remote 
+              cd transactions-fit-performer/performers/dotnet/couchbase-net-client
+              git fetch ssh://review.couchbase.org:29418/couchbase-net-client refs/changes/80/207280/1 && git checkout FETCH_HEAD
+              git log -n2
+              cd ../../..
               sed -i 's/kvAndQuery(r/kvGetsAndInserts(r/g' transactions-fit-performer/test-driver/src/test/scala/com/couchbase/situational/tests/CbDinoTest.scala
               cat transactions-fit-performer/test-driver/src/test/scala/com/couchbase/situational/tests/CbDinoTest.scala
               ;;
