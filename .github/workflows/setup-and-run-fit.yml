@@ -123,7 +123,7 @@ jobs:
               pwd
               git fetch "http://willbroadbelt@review.couchbase.org/couchbase-net-client" refs/changes/80/207280/1 && git checkout FETCH_HEAD
               pwd
-              cd ../../..
+              cd ../../../
               pwd
               sed -i 's/kvAndQuery(r/kvGetsAndInserts(r/g' transactions-fit-performer/test-driver/src/test/scala/com/couchbase/situational/tests/CbDinoTest.scala
               cat transactions-fit-performer/test-driver/src/test/scala/com/couchbase/situational/tests/CbDinoTest.scala
