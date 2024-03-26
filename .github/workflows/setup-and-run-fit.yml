@@ -178,11 +178,13 @@ jobs:
       #   if: always()
       #   run: |
       #    docker logs ${{ github.event.inputs.sdk }}-performer-container
-      - name: 'Upload Artifact'
+      - name: Zip the performer logs
+        run: zip jenkins-sdk/${{ github.event.inputs.sdk }}-performer-container.log.zip jenkins-sdk/${{ github.event.inputs.sdk }}-performer-container.log
+      - name: Upload ${{ github.event.inputs.sdk }} logs artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: performer-logs
-          path: jenkins-sdk/${{ github.event.inputs.sdk }}-performer-container.log
+          path: jenkins-sdk/${{ github.event.inputs.sdk }}-performer-container.log.zip
           retention-days: 15
 
