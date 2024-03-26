@@ -152,6 +152,7 @@ jobs:
           cd jenkins-sdk
           ./gradlew buildPerformer --args="-d ../ -i ${{ github.event.inputs.sdk }}-performer -s ${{ github.event.inputs.sdk }}"
           docker run --network=fit -d --name ${{ github.event.inputs.sdk }}-performer-container -p 8060:8060 ${{ github.event.inputs.sdk }}-performer
+          docker logs --follow ${{ github.event.inputs.sdk }}-performer-container 2>&1 | tee ${{ github.event.inputs.sdk }}-performer-container.log &
       - name: Edit values from the FITConfiguration.json
         run: |
           cd transactions-fit-performer/test-driver
@@ -173,7 +174,15 @@ jobs:
         run: |
          cd transactions-fit-performer
          mvn -B --projects test-driver --also-make -Dmaven.test.failure.ignore -DfailIfNoTests=false -Dtest=${{ github.event.inputs.run-specific-test }} test -Dgroups=situational,cbDino -DexcludedGroups=openshift,capella
-      - name: Capture ${{ github.event.inputs.sdk }} performer logs
+      # - name: Capture ${{ github.event.inputs.sdk }} performer logs
+      #   if: always()
+      #   run: |
+      #    docker logs ${{ github.event.inputs.sdk }}-performer-container
+      - name: 'Upload Artifact'
         if: always()
-        run: |
-         docker logs ${{ github.event.inputs.sdk }}-performer-container
+        uses: actions/upload-artifact@v4
+        with:
+          name: performer-logs
+          path: jenkins-sdk/${{ github.event.inputs.sdk }}-performer-container.log
+          retention-days: 15
+
