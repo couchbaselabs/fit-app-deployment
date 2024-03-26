@@ -174,17 +174,11 @@ jobs:
         run: |
          cd transactions-fit-performer
          mvn -B --projects test-driver --also-make -Dmaven.test.failure.ignore -DfailIfNoTests=false -Dtest=${{ github.event.inputs.run-specific-test }} test -Dgroups=situational,cbDino -DexcludedGroups=openshift,capella
-      # - name: Capture ${{ github.event.inputs.sdk }} performer logs
-      #   if: always()
-      #   run: |
-      #    docker logs ${{ github.event.inputs.sdk }}-performer-container
-      - name: Zip the performer logs
-        run: zip jenkins-sdk/${{ github.event.inputs.sdk }}-performer-container.log.zip jenkins-sdk/${{ github.event.inputs.sdk }}-performer-container.log
       - name: Upload ${{ github.event.inputs.sdk }} logs artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: performer-logs
-          path: jenkins-sdk/${{ github.event.inputs.sdk }}-performer-container.log.zip
+          path: jenkins-sdk/${{ github.event.inputs.sdk }}-performer-container.log
           retention-days: 15
 
