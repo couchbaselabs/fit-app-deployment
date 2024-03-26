@@ -132,6 +132,8 @@ jobs:
               git submodule update --init --force --remote 
               sed -i 's/kvAndQuery(r/kvGetsAndInserts(r/g' transactions-fit-performer/test-driver/src/test/scala/com/couchbase/situational/tests/CbDinoTest.scala
               cat transactions-fit-performer/test-driver/src/test/scala/com/couchbase/situational/tests/CbDinoTest.scala
+              sed -i 's/]/, "includeClientLogs=true"]/g' performers/dotnet/Couchbase.Transactions.FitPerformer/Dockerfile
+              cat performers/dotnet/Couchbase.Transactions.FitPerformer/Dockerfile
               ;;
             ("cpp")
               git submodule init
