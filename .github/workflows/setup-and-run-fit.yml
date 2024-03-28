@@ -150,7 +150,7 @@ jobs:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
       - name: Set isGerrit flag
         id: set_flag
-        run: echo "::set-output name=isGerrit::${{ startsWith(inputs.sdk-version, 'refs/changes') }}"
+        run: echo "name=isGerrit" >> ${{ startsWith(inputs.sdk-version, 'refs/changes') }}
       - name: build ${{ github.event.inputs.sdk }} performer using specific tag
         if: ${{ github.event.inputs.sdk-version != '' && steps.set_flag.outputs.isGerrit != 'true' }}
         run: |
