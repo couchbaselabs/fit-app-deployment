@@ -22,9 +22,6 @@ on:
       sdk-version:
         description: SDK version (tag/SHA/Gerrit ref) to checkout
         type: string
-      is-gerrit:
-        description: Tick box if you entered a Gerrit change ref above
-        type: boolean
       private-endpoints:
         description: Run the tests with private endpoints
         type: choice
@@ -151,13 +148,16 @@ jobs:
           mvn clean install
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+      - name: Set isGerrit flag
+        id: set_flag
+        run: echo "::set-output name=isGerrit::${{ startsWith(inputs.sdk-version, 'refs/changes') }}"
       - name: build ${{ github.event.inputs.sdk }} performer using specific tag
-        if: ${{ github.event.inputs.sdk-version != '' && github.event.inputs.is-gerrit != 'true' }}
+        if: ${{ github.event.inputs.sdk-version != '' && steps.set_flag.outputs.isGerrit == 'true' }}
         run: |
           cd jenkins-sdk
           ./gradlew buildPerformer --args="-d ../ -i ${{ github.event.inputs.sdk }}-performer -s ${{ github.event.inputs.sdk }} -v ${{ github.event.inputs.sdk-version }}"
       - name: build ${{ github.event.inputs.sdk }} performer using gerrit change
-        if: ${{ github.event.inputs.sdk-version != '' && github.event.inputs.is-gerrit == 'true' }}
+        if: ${{ github.event.inputs.sdk-version != '' && steps.set_flag.outputs.isGerrit == 'true' }}
         run: |
           cd jenkins-sdk
           ./gradlew buildPerformer --args="-d ../ -i ${{ github.event.inputs.sdk }}-performer -s ${{ github.event.inputs.sdk }} -g ${{ github.event.inputs.sdk-version }}"
