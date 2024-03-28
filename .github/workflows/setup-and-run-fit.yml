@@ -19,6 +19,12 @@ on:
         - "scala"
         - "kotlin"
         - "php"
+      sdk-version:
+        description: SDK version (tag/SHA/Gerrit ref) to checkout
+        type: string
+      is-gerrit:
+        description: Tick box if you entered a Gerrit change ref above
+        type: boolean
       private-endpoints:
         description: Run the tests with private endpoints
         type: choice
@@ -145,10 +151,24 @@ jobs:
           mvn clean install
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-      - name: start ${{ github.event.inputs.sdk }}  performer
+      - name: build ${{ github.event.inputs.sdk }} performer using specific tag
+        if: ${{ github.event.inputs.sdk-version != '' && github.event.inputs.is-gerrit != 'true' }}
+        run: |
+          cd jenkins-sdk
+          ./gradlew buildPerformer --args="-d ../ -i ${{ github.event.inputs.sdk }}-performer -s ${{ github.event.inputs.sdk }} -v ${{ github.event.inputs.sdk-version }}"
+      - name: build ${{ github.event.inputs.sdk }} performer using gerrit change
+        if: ${{ github.event.inputs.sdk-version != '' && github.event.inputs.is-gerrit == 'true' }}
+        run: |
+          cd jenkins-sdk
+          ./gradlew buildPerformer --args="-d ../ -i ${{ github.event.inputs.sdk }}-performer -s ${{ github.event.inputs.sdk }} -g ${{ github.event.inputs.sdk-version }}"
+      - name: build ${{ github.event.inputs.sdk }} performer using latest commit
+        if: ${{ github.event.inputs.sdk-version == '' }}
         run: |
           cd jenkins-sdk
           ./gradlew buildPerformer --args="-d ../ -i ${{ github.event.inputs.sdk }}-performer -s ${{ github.event.inputs.sdk }}"
+      - name: start ${{ github.event.inputs.sdk }} performer 
+        run: |
+          cd jenkins-sdk
           docker run --network=fit -d --name ${{ github.event.inputs.sdk }}-performer-container -p 8060:8060 ${{ github.event.inputs.sdk }}-performer
       - name: Edit values from the FITConfiguration.json
         run: |
