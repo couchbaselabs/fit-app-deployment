@@ -152,7 +152,7 @@ jobs:
         id: set_flag
         run: echo "::set-output name=isGerrit::${{ startsWith(inputs.sdk-version, 'refs/changes') }}"
       - name: build ${{ github.event.inputs.sdk }} performer using specific tag
-        if: ${{ github.event.inputs.sdk-version != '' && steps.set_flag.outputs.isGerrit == 'true' }}
+        if: ${{ github.event.inputs.sdk-version != '' && steps.set_flag.outputs.isGerrit != 'true' }}
         run: |
           cd jenkins-sdk
           ./gradlew buildPerformer --args="-d ../ -i ${{ github.event.inputs.sdk }}-performer -s ${{ github.event.inputs.sdk }} -v ${{ github.event.inputs.sdk-version }}"
