@@ -37,19 +37,13 @@ on:
       run-specific-test:
         description: Target a specific test to run (i.e. CbDinoTest#rebalance3To5NodesMixedKvAndQuery)
         type: string
-      sbx-id-api:
-        description: The sandbox api (i.e. https://api.sbx-10.sandbox.nonprod-project-avengers.com) iff using the sbx environment 
-        type: string
-      sbx-org-id:
-        description: The sandbox organisation id to deploy to
-        type: string
-      sbx-user:
-        description: The user for the given sandbox (must already be created)
-        type: string
-      sbx-password:
-        description: The user password for the given sandbox (must already be created)
-        type: string
-
+      enable-logs:
+        description: Enable SDK logs on the performer - only enable if running 1 test!
+        type: choice
+        options:
+        - "false"
+        - "true"
+        
 jobs:
   build:
     name: Build
@@ -148,6 +142,13 @@ jobs:
           mvn clean install
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+      - name: Enable/disabling logs
+        if: ${{ github.event.inputs.enable-logs == 'true' }}
+        run: |
+          sed '/ENTRYPOINT.*]/{s/]/, "includeClientLogs=true"]/;p;}' -i transactions-fit-performer/performers/dotnet/Couchbase.Transactions.FitPerformer/Dockerfile_NET6
+          cat transactions-fit-performer/performers/dotnet/Couchbase.Transactions.FitPerformer/Dockerfile_NET6
+          sed '/ENTRYPOINT.*]/{s/]/, "includeClientLogs=true"]/;p;}' -i transactions-fit-performer/performers/dotnet/Couchbase.Transactions.FitPerformer/Dockerfile_NET8
+          cat transactions-fit-performer/performers/dotnet/Couchbase.Transactions.FitPerformer/Dockerfile_NET8
       - name: Set isGerrit flag
         id: set_flag
         run: echo "::set-output name=isGerrit::${{ startsWith(inputs.sdk-version, 'refs/changes') }}"
@@ -170,6 +171,7 @@ jobs:
         run: |
           cd jenkins-sdk
           docker run --network=fit -d --name ${{ github.event.inputs.sdk }}-performer-container -p 8060:8060 ${{ github.event.inputs.sdk }}-performer
+          docker logs --follow ${{ github.event.inputs.sdk }}-performer-container 2>&1 | tee ${{ github.event.inputs.sdk }}-performer-container.log &
       - name: Edit values from the FITConfiguration.json
         run: |
           cd transactions-fit-performer/test-driver
@@ -191,7 +193,10 @@ jobs:
         run: |
          cd transactions-fit-performer
          mvn -B --projects test-driver --also-make -Dmaven.test.failure.ignore -DfailIfNoTests=false -Dtest=${{ github.event.inputs.run-specific-test }} test -Dgroups=situational,cbDino -DexcludedGroups=openshift,capella
-      - name: Capture ${{ github.event.inputs.sdk }} performer logs
+      - name: Upload ${{ github.event.inputs.sdk }} logs artifact
         if: always()
-        run: |
-         docker logs ${{ github.event.inputs.sdk }}-performer-container
+        uses: actions/upload-artifact@v4
+        with:
+          name: performer-logs
+          path: jenkins-sdk/${{ github.event.inputs.sdk }}-performer-container.log
+          retention-days: 15
