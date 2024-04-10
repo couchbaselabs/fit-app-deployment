@@ -53,7 +53,7 @@ on:
 jobs:
   build:
     name: Build
-    runs-on: [self-hosted, aws]
+    runs-on: ubuntu-latest
     environment:
       name: ${{ github.event.inputs.environment }}
     steps:
