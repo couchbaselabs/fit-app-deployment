@@ -129,6 +129,7 @@ jobs:
       - name: clone fit and build gRPC
         run: |
           git clone git@github.com:couchbaselabs/transactions-fit-performer.git
+          cd transactions-fit-performer
           touch random_cbdino_test_file.scala
           echo "${{ vars.CHANGE_CB_DINO_TEST_FILE }}" > random_cbdino_test_file.scala
           cp random_cbdino_test_file.scala test-driver/src/test/scala/com/couchbase/situational/tests/CbDinoTest.scala
