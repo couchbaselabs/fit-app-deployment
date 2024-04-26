@@ -176,6 +176,7 @@ jobs:
       - name: Edit values from the FITConfiguration.json
         run: |
           cd transactions-fit-performer/test-driver
+          echo ${{ vars.WAIT_TIME_BEFORE_EXECUTE_SITUATION }}
           echo "`jq --arg e "${{ vars.EXCLUDETESTS }}" '.excludeTests=[$e]' FITConfiguration.example.json`" > FITConfiguration.json
           echo "`jq --arg e "${{ github.event.inputs.server-version }}" '.situational.cbdino.version=$e' FITConfiguration.json`" > FITConfiguration.json
           echo "`jq --arg e "${{ github.event.inputs.server-image }}" '.situational.cbdino.image=$e' FITConfiguration.json`" > FITConfiguration.json
