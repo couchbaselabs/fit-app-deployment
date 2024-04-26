@@ -176,30 +176,18 @@ jobs:
       - name: Edit values from the FITConfiguration.json
         run: |
           cd transactions-fit-performer/test-driver
-          jq \
-          --arg excludeTests "${{ vars.EXCLUDETESTS }}" \
-          --arg serverVersion "${{ github.event.inputs.server-version }}" \
-          --arg serverImage "${{ github.event.inputs.server-image }}" \
-          --arg deployer "${{ vars.DEPLOYER }}" \
-          --arg region "${{ vars.REGION }}" \
-          --arg cbdinoPath "${{ vars.CBDINO_PATH }}" \
-          --arg pgHost "${{ vars.PGHOST }}" \
-          --arg pgUsername "${{ vars.PGUSERNAME }}" \
-          --arg pgPassword "${{ secrets.PG_PASSWORD }}" \
-          --argjson privateEndpoints "${{ github.event.inputs.private-endpoints }}" \
-          # --argjson waitTime "${{ vars.WAIT_TIME_BEFORE_EXECUTE_SITUATION }}" \
-          '.excludeTests = [$excludeTests] | 
-           .situational.cbdino.version = $serverVersion |
-           .situational.cbdino.image = $serverImage |
-           .situational.cbdino.deployer = $deployer |
-           .situational.cbdino.region = $region |
-           .situational.cbdino.cbDinoClusterAppPath = $cbdinoPath |
-           .situational.database.jdbc = $pgHost |
-           .situational.database.username = $pgUsername |
-           .situational.database.password = $pgPassword |
-           .situational.cbdino.enablePrivateEndpoint = $privateEndpoints |
-           # .situational.cbdino.waitTimeBeforeExecuteSituation = $waitTime' \
-          FITConfiguration.example.json > FITConfiguration.json
+          cd transactions-fit-performer/test-driver
+          echo "`jq --arg e "${{ vars.EXCLUDETESTS }}" '.excludeTests=[$e]' FITConfiguration.example.json`" > FITConfiguration.json
+          echo "`jq --arg e "${{ github.event.inputs.server-version }}" '.situational.cbdino.version=$e' FITConfiguration.json`" > FITConfiguration.json
+          echo "`jq --arg e "${{ github.event.inputs.server-image }}" '.situational.cbdino.image=$e' FITConfiguration.json`" > FITConfiguration.json
+          echo "`jq --arg e "${{ vars.DEPLOYER }}" '.situational.cbdino.deployer=$e' FITConfiguration.json`" > FITConfiguration.json
+          echo "`jq --arg e "${{ vars.REGION }}" '.situational.cbdino.region=$e' FITConfiguration.json`" > FITConfiguration.json
+          echo "`jq --arg e "${{ vars.CBDINO_PATH }}" '.situational.cbdino.cbDinoClusterAppPath=$e' FITConfiguration.json`" > FITConfiguration.json
+          echo "`jq --arg e "${{ vars.PGHOST }}" '.situational.database.jdbc=$e' FITConfiguration.json`" > FITConfiguration.json
+          echo "`jq --arg e "${{ vars.PGUSERNAME }}" '.situational.database.username=$e' FITConfiguration.json`" > FITConfiguration.json
+          echo "`jq --arg e "${{ secrets.PG_PASSWORD }}" '.situational.database.password=$e' FITConfiguration.json`" > FITConfiguration.json
+          echo "`jq --argjson e "${{ github.event.inputs.private-endpoints }}" '.situational.cbdino.enablePrivateEndpoint=$e' FITConfiguration.json`" > FITConfiguration.json
+          echo "`jq --argjson e ${{ toJson(vars.WAIT_TIME_BEFORE_EXECUTE_SITUATION) }} '.situational.cbdino.waitTimeBeforeExecuteSituation=$e' FITConfiguration.json`" > FITConfiguration.json
 
           cat FITConfiguration.json
       # - name: build driver docker image
