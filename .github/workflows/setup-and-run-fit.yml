@@ -126,6 +126,7 @@ jobs:
           CAPELLA_OID: ${{ inputs.sbx-org-id || vars.CAP_OID }}
           CAPELLA_USER: ${{ inputs.sbx-user || vars.CAP_USER }}
           CAPELLA_PASS: ${{ inputs.sbx-password || vars.CAP_PASS }}
+          CAP_OVERRIDE_TOKEN: ${{ vars.CAP_OVERRIDE_TOKEN }}
         run: |
           ./cbdinocluster-linux-amd64 init --auto
           cat ~/.cbdinocluster
