@@ -187,7 +187,7 @@ jobs:
           --arg pgUsername "${{ vars.PGUSERNAME }}" \
           --arg pgPassword "${{ secrets.PG_PASSWORD }}" \
           --argjson privateEndpoints "${{ github.event.inputs.private-endpoints }}" \
-          --argjson waitTime "${{ vars.WAIT_TIME_BEFORE_EXECUTE_SITUATION }}" \
+          # --argjson waitTime "${{ vars.WAIT_TIME_BEFORE_EXECUTE_SITUATION }}" \
           '.excludeTests = [$excludeTests] | 
            .situational.cbdino.version = $serverVersion |
            .situational.cbdino.image = $serverImage |
@@ -198,7 +198,7 @@ jobs:
            .situational.database.username = $pgUsername |
            .situational.database.password = $pgPassword |
            .situational.cbdino.enablePrivateEndpoint = $privateEndpoints |
-           .situational.cbdino.waitTimeBeforeExecuteSituation = $waitTime' \
+           # .situational.cbdino.waitTimeBeforeExecuteSituation = $waitTime' \
           FITConfiguration.example.json > FITConfiguration.json
 
           cat FITConfiguration.json
