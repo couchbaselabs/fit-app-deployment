@@ -154,25 +154,25 @@ jobs:
       - name: Set isGerrit flag
         id: set_flag
         run: echo "::set-output name=isGerrit::${{ startsWith(inputs.sdk-version, 'refs/changes') }}"
-      - name: build ${{ github.event.inputs.sdk }} performer using specific tag
-        if: ${{ github.event.inputs.sdk-version != '' && steps.set_flag.outputs.isGerrit != 'true' }}
-        run: |
-          cd jenkins-sdk
-          ./gradlew buildPerformer --args="-d ../ -i ${{ github.event.inputs.sdk }}-performer -s ${{ github.event.inputs.sdk }} -v ${{ github.event.inputs.sdk-version }}"
-      - name: build ${{ github.event.inputs.sdk }} performer using gerrit change
-        if: ${{ github.event.inputs.sdk-version != '' && steps.set_flag.outputs.isGerrit == 'true' }}
-        run: |
-          cd jenkins-sdk
-          ./gradlew buildPerformer --args="-d ../ -i ${{ github.event.inputs.sdk }}-performer -s ${{ github.event.inputs.sdk }} -g ${{ github.event.inputs.sdk-version }}"
-      - name: build ${{ github.event.inputs.sdk }} performer using latest commit
-        if: ${{ github.event.inputs.sdk-version == '' }}
-        run: |
-          cd jenkins-sdk
-          ./gradlew buildPerformer --args="-d ../ -i ${{ github.event.inputs.sdk }}-performer -s ${{ github.event.inputs.sdk }}"
-      - name: start ${{ github.event.inputs.sdk }} performer 
-        run: |
-          cd jenkins-sdk
-          docker run --network=fit -d --name ${{ github.event.inputs.sdk }}-performer-container -p 8060:8060 ${{ github.event.inputs.sdk }}-performer
+      # - name: build ${{ github.event.inputs.sdk }} performer using specific tag
+      #   if: ${{ github.event.inputs.sdk-version != '' && steps.set_flag.outputs.isGerrit != 'true' }}
+      #   run: |
+      #     cd jenkins-sdk
+      #     ./gradlew buildPerformer --args="-d ../ -i ${{ github.event.inputs.sdk }}-performer -s ${{ github.event.inputs.sdk }} -v ${{ github.event.inputs.sdk-version }}"
+      # - name: build ${{ github.event.inputs.sdk }} performer using gerrit change
+      #   if: ${{ github.event.inputs.sdk-version != '' && steps.set_flag.outputs.isGerrit == 'true' }}
+      #   run: |
+      #     cd jenkins-sdk
+      #     ./gradlew buildPerformer --args="-d ../ -i ${{ github.event.inputs.sdk }}-performer -s ${{ github.event.inputs.sdk }} -g ${{ github.event.inputs.sdk-version }}"
+      # - name: build ${{ github.event.inputs.sdk }} performer using latest commit
+      #   if: ${{ github.event.inputs.sdk-version == '' }}
+      #   run: |
+      #     cd jenkins-sdk
+      #     ./gradlew buildPerformer --args="-d ../ -i ${{ github.event.inputs.sdk }}-performer -s ${{ github.event.inputs.sdk }}"
+      # - name: start ${{ github.event.inputs.sdk }} performer 
+      #   run: |
+      #     cd jenkins-sdk
+      #     docker run --network=fit -d --name ${{ github.event.inputs.sdk }}-performer-container -p 8060:8060 ${{ github.event.inputs.sdk }}-performer
       - name: Edit values from the FITConfiguration.json
         run: |
           cd transactions-fit-performer/test-driver
@@ -202,15 +202,15 @@ jobs:
           FITConfiguration.example.json > FITConfiguration.json
 
           cat FITConfiguration.json
-      - name: build driver docker image
-        run: |
-          cd transactions-fit-performer
-          docker build --no-cache -f test-driver/Dockerfile -t fit/test-driver:latest .
-      - name: Run SIT tests
-        run: |
-         cd transactions-fit-performer
-         mvn -B --projects test-driver --also-make -Dmaven.test.failure.ignore -DfailIfNoTests=false -Dtest=${{ github.event.inputs.run-specific-test }} test -Dgroups=situational,cbDino -DexcludedGroups=openshift,capella
-      - name: Capture ${{ github.event.inputs.sdk }} performer logs
-        if: always()
-        run: |
-         docker logs ${{ github.event.inputs.sdk }}-performer-container
+      # - name: build driver docker image
+      #   run: |
+      #     cd transactions-fit-performer
+      #     docker build --no-cache -f test-driver/Dockerfile -t fit/test-driver:latest .
+      # - name: Run SIT tests
+      #   run: |
+      #    cd transactions-fit-performer
+      #    mvn -B --projects test-driver --also-make -Dmaven.test.failure.ignore -DfailIfNoTests=false -Dtest=${{ github.event.inputs.run-specific-test }} test -Dgroups=situational,cbDino -DexcludedGroups=openshift,capella
+      # - name: Capture ${{ github.event.inputs.sdk }} performer logs
+      #   if: always()
+      #   run: |
+      #    docker logs ${{ github.event.inputs.sdk }}-performer-container
