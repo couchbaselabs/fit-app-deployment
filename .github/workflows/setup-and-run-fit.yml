@@ -45,7 +45,7 @@ jobs:
           docker network create -d bridge fit
       - name: Download and setup cb-dino cluster
         run: |
-          wget https://github.com/couchbaselabs/cbdinocluster/releases/download/v0.0.20/cbdinocluster-linux
+          wget https://github.com/couchbaselabs/cbdinocluster/releases/download/v0.0.41/cbdinocluster-linux-arm64
           chmod 744 ./cbdinocluster-linux
           pwd
       - name: init cbdino cluster for ${{ vars.DEPLOYER }}
