@@ -34,6 +34,7 @@ on:
         options:
         - "7.2"
         - "7.6"
+        - "7.6.1"
       run-specific-test:
         description: Target a specific test to run (i.e. CbDinoTest#rebalance3To5NodesMixedKvAndQuery)
         type: string
@@ -175,7 +176,7 @@ jobs:
           cd transactions-fit-performer/test-driver
           echo "`jq --arg e "${{ vars.EXCLUDETESTS }}" '.excludeTests=[$e]' FITConfiguration.example.json`" > FITConfiguration.json
           echo "`jq --arg e "${{ github.event.inputs.server-version }}" '.situational.cbdino.version=$e' FITConfiguration.json`" > FITConfiguration.json
-          echo "`jq --arg e "${{ vars.DEPLOYER }}" '.situational.cbdino.deployer=$e' FITConfiguration.json`" > FITConfiguration.json
+          echo "`jq --arg e "docker" '.situational.cbdino.deployer=$e' FITConfiguration.json`" > FITConfiguration.json
           echo "`jq --arg e "${{ vars.REGION }}" '.situational.cbdino.region=$e' FITConfiguration.json`" > FITConfiguration.json
           echo "`jq --arg e "${{ vars.CBDINO_PATH }}" '.situational.cbdino.cbDinoClusterAppPath=$e' FITConfiguration.json`" > FITConfiguration.json
           echo "`jq --arg e "${{ vars.PGHOST }}" '.situational.database.jdbc=$e' FITConfiguration.json`" > FITConfiguration.json
