@@ -114,8 +114,8 @@ jobs:
           docker network create -d bridge fit
       - name: Download and setup cb-dino cluster
         run: |
-          wget https://github.com/couchbaselabs/cbdinocluster/releases/download/v0.0.20/cbdinocluster-linux
-          chmod 744 ./cbdinocluster-linux
+          wget https://github.com/couchbaselabs/cbdinocluster/releases/download/v0.0.20/cbdinocluster-linux-amd64
+          chmod 744 ./cbdinocluster-linux-amd64
           pwd
       - name: init cbdino cluster for ${{ vars.DEPLOYER }}
         env:
@@ -124,7 +124,7 @@ jobs:
           CAPELLA_USER: ${{ inputs.sbx-user || vars.CAP_USER }}
           CAPELLA_PASS: ${{ inputs.sbx-password || vars.CAP_PASS }}
         run: |
-          ./cbdinocluster-linux init --auto
+          ./cbdinocluster-linux-amd64 init --auto
           cat ~/.cbdinocluster
       - name: clone fit and build gRPC
         run: |
