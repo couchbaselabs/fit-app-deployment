@@ -19,9 +19,6 @@ on:
         - "scala"
         - "kotlin"
         - "php"
-      sdk-version:
-        description: SDK version (tag/SHA/Gerrit ref) to checkout
-        type: string
       private-endpoints:
         description: Run the tests with private endpoints
         type: choice
@@ -34,6 +31,12 @@ on:
         options:
         - "7.2"
         - "7.6"
+        - "7.2.4"
+        - "7.6.0"
+        - "7.1.3"
+      sdk-version:
+        description: SDK version (tag/SHA/Gerrit ref) to checkout
+        type: string
       run-specific-test:
         description: Target a specific test to run (i.e. CbDinoTest#rebalance3To5NodesMixedKvAndQuery)
         type: string
@@ -114,8 +117,8 @@ jobs:
           docker network create -d bridge fit
       - name: Download and setup cb-dino cluster
         run: |
-          wget https://github.com/couchbaselabs/cbdinocluster/releases/download/v0.0.20/cbdinocluster-linux
-          chmod 744 ./cbdinocluster-linux
+          wget https://github.com/couchbaselabs/cbdinocluster/releases/download/v0.0.42/cbdinocluster-linux-amd64
+          chmod 744 ./cbdinocluster-linux-amd64
           pwd
       - name: init cbdino cluster for ${{ vars.DEPLOYER }}
         env:
@@ -123,8 +126,9 @@ jobs:
           CAPELLA_OID: ${{ inputs.sbx-org-id || vars.CAP_OID }}
           CAPELLA_USER: ${{ inputs.sbx-user || vars.CAP_USER }}
           CAPELLA_PASS: ${{ inputs.sbx-password || vars.CAP_PASS }}
+          CAPELLA_OVERRIDE_TOKEN: ${{ vars.CAP_OVERRIDE_TOKEN }}
         run: |
-          ./cbdinocluster-linux init --auto
+          ./cbdinocluster-linux-amd64 init --auto
           cat ~/.cbdinocluster
       - name: clone fit and build gRPC
         run: |
@@ -175,6 +179,7 @@ jobs:
           cd transactions-fit-performer/test-driver
           echo "`jq --arg e "${{ vars.EXCLUDETESTS }}" '.excludeTests=[$e]' FITConfiguration.example.json`" > FITConfiguration.json
           echo "`jq --arg e "${{ github.event.inputs.server-version }}" '.situational.cbdino.version=$e' FITConfiguration.json`" > FITConfiguration.json
+          echo "`jq --arg e "${{ vars.SERVER_IMAGE }}" '.situational.cbdino.image=$e' FITConfiguration.json`" > FITConfiguration.json
           echo "`jq --arg e "${{ vars.DEPLOYER }}" '.situational.cbdino.deployer=$e' FITConfiguration.json`" > FITConfiguration.json
           echo "`jq --arg e "${{ vars.REGION }}" '.situational.cbdino.region=$e' FITConfiguration.json`" > FITConfiguration.json
           echo "`jq --arg e "${{ vars.CBDINO_PATH }}" '.situational.cbdino.cbDinoClusterAppPath=$e' FITConfiguration.json`" > FITConfiguration.json
@@ -182,6 +187,8 @@ jobs:
           echo "`jq --arg e "${{ vars.PGUSERNAME }}" '.situational.database.username=$e' FITConfiguration.json`" > FITConfiguration.json
           echo "`jq --arg e "${{ secrets.PG_PASSWORD }}" '.situational.database.password=$e' FITConfiguration.json`" > FITConfiguration.json
           echo "`jq --argjson e "${{ github.event.inputs.private-endpoints }}" '.situational.cbdino.enablePrivateEndpoint=$e' FITConfiguration.json`" > FITConfiguration.json
+          echo "`jq --argjson e ${{ toJson(vars.WAIT_TIME_BEFORE_EXECUTE_SITUATION) }} '.situational.cbdino.waitTimeBeforeExecuteSituation = ($e | tonumber)' FITConfiguration.json`" > FITConfiguration.json
+          
           cat FITConfiguration.json
       - name: build driver docker image
         run: |
