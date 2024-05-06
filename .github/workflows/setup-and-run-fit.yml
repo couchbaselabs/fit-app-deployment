@@ -114,8 +114,10 @@ jobs:
           docker network create -d bridge fit
       - name: Download and setup cb-dino cluster
         run: |
-          wget https://github.com/couchbaselabs/cbdinocluster/releases/download/v0.0.20/cbdinocluster-linux
-          chmod 744 ./cbdinocluster-linux
+          wget ${{ vars.CB_DINO_RELEASE_URL }}
+          CB_DINO_NAME=$(echo ${{ vars.CB_DINO_RELEASE_URL }} | awk -F'/' '{print $NF}')
+          echo "Folder name: $CB_DINO_NAME"
+          chmod 744 ./$CB_DINO_NAME
           pwd
       - name: init cbdino cluster for ${{ vars.DEPLOYER }}
         env:
@@ -124,7 +126,7 @@ jobs:
           CAPELLA_USER: ${{ inputs.sbx-user || vars.CAP_USER }}
           CAPELLA_PASS: ${{ inputs.sbx-password || vars.CAP_PASS }}
         run: |
-          ./cbdinocluster-linux init --auto
+          ./$CB_DINO_NAME init --auto
           cat ~/.cbdinocluster
       - name: clone fit and build gRPC
         run: |
@@ -175,7 +177,7 @@ jobs:
           cd transactions-fit-performer/test-driver
           echo "`jq --arg e "${{ vars.EXCLUDETESTS }}" '.excludeTests=[$e]' FITConfiguration.example.json`" > FITConfiguration.json
           echo "`jq --arg e "${{ github.event.inputs.server-version }}" '.situational.cbdino.version=$e' FITConfiguration.json`" > FITConfiguration.json
-          echo "`jq --arg e "${{ vars.DEPLOYER }}" '.situational.cbdino.deployer=$e' FITConfiguration.json`" > FITConfiguration.json
+          echo "`jq --arg e "/opt/actions-runner/_work/fit-app-deployment/fit-app-deployment/${{ vars.DEPLOYER }}" '.situational.cbdino.deployer=$e' FITConfiguration.json`" > FITConfiguration.json
           echo "`jq --arg e "${{ vars.REGION }}" '.situational.cbdino.region=$e' FITConfiguration.json`" > FITConfiguration.json
           echo "`jq --arg e "${{ vars.CBDINO_PATH }}" '.situational.cbdino.cbDinoClusterAppPath=$e' FITConfiguration.json`" > FITConfiguration.json
           echo "`jq --arg e "${{ vars.PGHOST }}" '.situational.database.jdbc=$e' FITConfiguration.json`" > FITConfiguration.json
