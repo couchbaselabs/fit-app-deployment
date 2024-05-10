@@ -103,17 +103,17 @@ jobs:
             ("java")
               git clone git@github.com:couchbase/couchbase-jvm-clients.git
               sed -i 's/<root level="DEBUG">/TRACE/g' couchbase-jvm-clients/java-fit-performer/src/main/resources/logback.xml
-              vim couchbase-jvm-clients/java-fit-performer/src/main/resources/logback.xml
+              cat couchbase-jvm-clients/java-fit-performer/src/main/resources/logback.xml
               ;;
             ("scala")
               git clone git@github.com:couchbase/couchbase-jvm-clients.git
               sed -i 's/<root level="DEBUG">/TRACE/g' couchbase-jvm-clients/scala-fit-performer/src/main/resources/logback.xml
-              vim couchbase-jvm-clients/java-fit-performer/src/main/resources/logback.xml
+              cat couchbase-jvm-clients/scala-fit-performer/src/main/resources/logback.xml
               ;;
             ("kotlin")
               git clone git@github.com:couchbase/couchbase-jvm-clients.git
               sed -i 's/<root level="DEBUG">/TRACE/g' couchbase-jvm-clients/kotlin-fit-performer/src/main/resources/logback.xml
-              vim couchbase-jvm-clients/java-fit-performer/src/main/resources/logback.xml
+              cat couchbase-jvm-clients/kotlin-fit-performer/src/main/resources/logback.xml
               ;;
             (*)
               echo "We are good here"
