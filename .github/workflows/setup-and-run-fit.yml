@@ -175,23 +175,21 @@ jobs:
         run: |
           cd jenkins-sdk
           ./gradlew buildPerformer --args="-d ../ -i ${{ github.event.inputs.sdk }}-performer -s ${{ github.event.inputs.sdk }} -v ${{ github.event.inputs.sdk-version }}"
-          docker logs --follow ${{ github.event.inputs.sdk }}-performer-container 2>&1 | tee ${{ github.event.inputs.sdk }}-performer-container.log &
       - name: build ${{ github.event.inputs.sdk }} performer using gerrit change
         if: ${{ github.event.inputs.sdk-version != '' && steps.set_flag.outputs.isGerrit == 'true' }}
         run: |
           cd jenkins-sdk
           ./gradlew buildPerformer --args="-d ../ -i ${{ github.event.inputs.sdk }}-performer -s ${{ github.event.inputs.sdk }} -g ${{ github.event.inputs.sdk-version }}"
-          docker logs --follow ${{ github.event.inputs.sdk }}-performer-container 2>&1 | tee ${{ github.event.inputs.sdk }}-performer-container.log &
       - name: build ${{ github.event.inputs.sdk }} performer using latest commit
         if: ${{ github.event.inputs.sdk-version == '' }}
         run: |
           cd jenkins-sdk
           ./gradlew buildPerformer --args="-d ../ -i ${{ github.event.inputs.sdk }}-performer -s ${{ github.event.inputs.sdk }}"
-          docker logs --follow ${{ github.event.inputs.sdk }}-performer-container 2>&1 | tee ${{ github.event.inputs.sdk }}-performer-container.log &
       - name: start ${{ github.event.inputs.sdk }} performer 
         run: |
           cd jenkins-sdk
           docker run --network=fit -d --name ${{ github.event.inputs.sdk }}-performer-container -p 8060:8060 ${{ github.event.inputs.sdk }}-performer
+          docker logs --follow ${{ github.event.inputs.sdk }}-performer-container 2>&1 | tee ${{ github.event.inputs.sdk }}-performer-container.log &
       - name: Edit values from the FITConfiguration.json
         run: |
           cd transactions-fit-performer/test-driver
