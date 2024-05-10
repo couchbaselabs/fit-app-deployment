@@ -96,10 +96,24 @@ jobs:
             sudo apt-get install -y aspnetcore-runtime-8.0
       - name: clone and setup couchbase jvm client 
         run: |
-          git clone git@github.com:couchbase/couchbase-jvm-clients.git
           case "${{ github.event.inputs.sdk }}" in
             ("dotnet")
               git clone git@github.com:couchbase/couchbase-net-client.git
+              ;;
+            ("java")
+              git clone git@github.com:couchbase/couchbase-jvm-clients.git
+              sed -i 's/<root level="DEBUG">/TRACE/g' couchbase-jvm-clients/java-fit-performer/src/main/resources/logback.xml
+              vim couchbase-jvm-clients/java-fit-performer/src/main/resources/logback.xml
+              ;;
+            ("scala")
+              git clone git@github.com:couchbase/couchbase-jvm-clients.git
+              sed -i 's/<root level="DEBUG">/TRACE/g' couchbase-jvm-clients/scala-fit-performer/src/main/resources/logback.xml
+              vim couchbase-jvm-clients/java-fit-performer/src/main/resources/logback.xml
+              ;;
+            ("kotlin")
+              git clone git@github.com:couchbase/couchbase-jvm-clients.git
+              sed -i 's/<root level="DEBUG">/TRACE/g' couchbase-jvm-clients/kotlin-fit-performer/src/main/resources/logback.xml
+              vim couchbase-jvm-clients/java-fit-performer/src/main/resources/logback.xml
               ;;
             (*)
               echo "We are good here"
@@ -107,98 +121,98 @@ jobs:
           esac
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-      - name: clone jenkins sdk repo
-        run: |
-          git clone git@github.com:couchbaselabs/jenkins-sdk.git
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-      - name: create FIT network
-        run: |
-          docker network create -d bridge fit
-      - name: Download and setup cb-dino cluster
-        run: |
-          wget https://github.com/couchbaselabs/cbdinocluster/releases/download/v0.0.42/cbdinocluster-linux-amd64
-          chmod 744 ./cbdinocluster-linux-amd64
-          pwd
-      - name: init cbdino cluster for ${{ vars.DEPLOYER }}
-        env:
-          CAPELLA_ENDPOINT: ${{ inputs.sbx-id-api || vars.CAP_END_POINT }}
-          CAPELLA_OID: ${{ inputs.sbx-org-id || vars.CAP_OID }}
-          CAPELLA_USER: ${{ inputs.sbx-user || vars.CAP_USER }}
-          CAPELLA_PASS: ${{ inputs.sbx-password || vars.CAP_PASS }}
-          CAPELLA_OVERRIDE_TOKEN: ${{ vars.CAP_OVERRIDE_TOKEN }}
-        run: |
-          ./cbdinocluster-linux-amd64 init --auto
-          cat ~/.cbdinocluster
-      - name: clone fit and build gRPC
-        run: |
-          git clone git@github.com:couchbaselabs/transactions-fit-performer.git
-          case "${{ github.event.inputs.sdk }}" in
-            ("dotnet")
-              git submodule init
-              git submodule update --init --force --remote 
-              sed -i 's/kvAndQuery(r/kvGetsAndInserts(r/g' transactions-fit-performer/test-driver/src/test/scala/com/couchbase/situational/tests/CbDinoTest.scala
-              cat transactions-fit-performer/test-driver/src/test/scala/com/couchbase/situational/tests/CbDinoTest.scala
-              ;;
-            ("cpp")
-              git submodule init
-              git submodule update --init --force --remote 
-              ;;
-            (*)
-              echo "We are good for this"
-              ;;
-          esac
-          cd transactions-fit-performer/gRPC/jvm
-          mvn clean install
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-      - name: Set isGerrit flag
-        id: set_flag
-        run: echo "::set-output name=isGerrit::${{ startsWith(inputs.sdk-version, 'refs/changes') }}"
-      - name: build ${{ github.event.inputs.sdk }} performer using specific tag
-        if: ${{ github.event.inputs.sdk-version != '' && steps.set_flag.outputs.isGerrit != 'true' }}
-        run: |
-          cd jenkins-sdk
-          ./gradlew buildPerformer --args="-d ../ -i ${{ github.event.inputs.sdk }}-performer -s ${{ github.event.inputs.sdk }} -v ${{ github.event.inputs.sdk-version }}"
-      - name: build ${{ github.event.inputs.sdk }} performer using gerrit change
-        if: ${{ github.event.inputs.sdk-version != '' && steps.set_flag.outputs.isGerrit == 'true' }}
-        run: |
-          cd jenkins-sdk
-          ./gradlew buildPerformer --args="-d ../ -i ${{ github.event.inputs.sdk }}-performer -s ${{ github.event.inputs.sdk }} -g ${{ github.event.inputs.sdk-version }}"
-      - name: build ${{ github.event.inputs.sdk }} performer using latest commit
-        if: ${{ github.event.inputs.sdk-version == '' }}
-        run: |
-          cd jenkins-sdk
-          ./gradlew buildPerformer --args="-d ../ -i ${{ github.event.inputs.sdk }}-performer -s ${{ github.event.inputs.sdk }}"
-      - name: start ${{ github.event.inputs.sdk }} performer 
-        run: |
-          cd jenkins-sdk
-          docker run --network=fit -d --name ${{ github.event.inputs.sdk }}-performer-container -p 8060:8060 ${{ github.event.inputs.sdk }}-performer
-      - name: Edit values from the FITConfiguration.json
-        run: |
-          cd transactions-fit-performer/test-driver
-          echo "`jq --arg e "${{ vars.EXCLUDETESTS }}" '.excludeTests=[$e]' FITConfiguration.example.json`" > FITConfiguration.json
-          echo "`jq --arg e "${{ github.event.inputs.server-version }}" '.situational.cbdino.version=$e' FITConfiguration.json`" > FITConfiguration.json
-          echo "`jq --arg e "${{ github.event.inputs.server-image }}" '.situational.cbdino.image=$e' FITConfiguration.json`" > FITConfiguration.json
-          echo "`jq --arg e "${{ vars.DEPLOYER }}" '.situational.cbdino.deployer=$e' FITConfiguration.json`" > FITConfiguration.json
-          echo "`jq --arg e "${{ vars.REGION }}" '.situational.cbdino.region=$e' FITConfiguration.json`" > FITConfiguration.json
-          echo "`jq --arg e "${{ vars.CBDINO_PATH }}" '.situational.cbdino.cbDinoClusterAppPath=$e' FITConfiguration.json`" > FITConfiguration.json
-          echo "`jq --arg e "${{ vars.PGHOST }}" '.situational.database.jdbc=$e' FITConfiguration.json`" > FITConfiguration.json
-          echo "`jq --arg e "${{ vars.PGUSERNAME }}" '.situational.database.username=$e' FITConfiguration.json`" > FITConfiguration.json
-          echo "`jq --arg e "${{ secrets.PG_PASSWORD }}" '.situational.database.password=$e' FITConfiguration.json`" > FITConfiguration.json
-          echo "`jq --argjson e "${{ github.event.inputs.private-endpoints }}" '.situational.cbdino.enablePrivateEndpoint=$e' FITConfiguration.json`" > FITConfiguration.json
-          echo "`jq --argjson e ${{ toJson(vars.WAIT_TIME_BEFORE_EXECUTE_SITUATION) }} '.situational.cbdino.waitTimeBeforeExecuteSituation = ($e | tonumber)' FITConfiguration.json`" > FITConfiguration.json
+      # - name: clone jenkins sdk repo
+      #   run: |
+      #     git clone git@github.com:couchbaselabs/jenkins-sdk.git
+      #   env:
+      #     SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+      # - name: create FIT network
+      #   run: |
+      #     docker network create -d bridge fit
+      # - name: Download and setup cb-dino cluster
+      #   run: |
+      #     wget https://github.com/couchbaselabs/cbdinocluster/releases/download/v0.0.42/cbdinocluster-linux-amd64
+      #     chmod 744 ./cbdinocluster-linux-amd64
+      #     pwd
+      # - name: init cbdino cluster for ${{ vars.DEPLOYER }}
+      #   env:
+      #     CAPELLA_ENDPOINT: ${{ inputs.sbx-id-api || vars.CAP_END_POINT }}
+      #     CAPELLA_OID: ${{ inputs.sbx-org-id || vars.CAP_OID }}
+      #     CAPELLA_USER: ${{ inputs.sbx-user || vars.CAP_USER }}
+      #     CAPELLA_PASS: ${{ inputs.sbx-password || vars.CAP_PASS }}
+      #     CAPELLA_OVERRIDE_TOKEN: ${{ vars.CAP_OVERRIDE_TOKEN }}
+      #   run: |
+      #     ./cbdinocluster-linux-amd64 init --auto
+      #     cat ~/.cbdinocluster
+      # - name: clone fit and build gRPC
+      #   run: |
+      #     git clone git@github.com:couchbaselabs/transactions-fit-performer.git
+      #     case "${{ github.event.inputs.sdk }}" in
+      #       ("dotnet")
+      #         git submodule init
+      #         git submodule update --init --force --remote 
+      #         sed -i 's/kvAndQuery(r/kvGetsAndInserts(r/g' transactions-fit-performer/test-driver/src/test/scala/com/couchbase/situational/tests/CbDinoTest.scala
+      #         cat transactions-fit-performer/test-driver/src/test/scala/com/couchbase/situational/tests/CbDinoTest.scala
+      #         ;;
+      #       ("cpp")
+      #         git submodule init
+      #         git submodule update --init --force --remote 
+      #         ;;
+      #       (*)
+      #         echo "We are good for this"
+      #         ;;
+      #     esac
+      #     cd transactions-fit-performer/gRPC/jvm
+      #     mvn clean install
+      #   env:
+      #     SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+      # - name: Set isGerrit flag
+      #   id: set_flag
+      #   run: echo "::set-output name=isGerrit::${{ startsWith(inputs.sdk-version, 'refs/changes') }}"
+      # - name: build ${{ github.event.inputs.sdk }} performer using specific tag
+      #   if: ${{ github.event.inputs.sdk-version != '' && steps.set_flag.outputs.isGerrit != 'true' }}
+      #   run: |
+      #     cd jenkins-sdk
+      #     ./gradlew buildPerformer --args="-d ../ -i ${{ github.event.inputs.sdk }}-performer -s ${{ github.event.inputs.sdk }} -v ${{ github.event.inputs.sdk-version }}"
+      # - name: build ${{ github.event.inputs.sdk }} performer using gerrit change
+      #   if: ${{ github.event.inputs.sdk-version != '' && steps.set_flag.outputs.isGerrit == 'true' }}
+      #   run: |
+      #     cd jenkins-sdk
+      #     ./gradlew buildPerformer --args="-d ../ -i ${{ github.event.inputs.sdk }}-performer -s ${{ github.event.inputs.sdk }} -g ${{ github.event.inputs.sdk-version }}"
+      # - name: build ${{ github.event.inputs.sdk }} performer using latest commit
+      #   if: ${{ github.event.inputs.sdk-version == '' }}
+      #   run: |
+      #     cd jenkins-sdk
+      #     ./gradlew buildPerformer --args="-d ../ -i ${{ github.event.inputs.sdk }}-performer -s ${{ github.event.inputs.sdk }}"
+      # - name: start ${{ github.event.inputs.sdk }} performer 
+      #   run: |
+      #     cd jenkins-sdk
+      #     docker run --network=fit -d --name ${{ github.event.inputs.sdk }}-performer-container -p 8060:8060 ${{ github.event.inputs.sdk }}-performer
+      # - name: Edit values from the FITConfiguration.json
+      #   run: |
+      #     cd transactions-fit-performer/test-driver
+      #     echo "`jq --arg e "${{ vars.EXCLUDETESTS }}" '.excludeTests=[$e]' FITConfiguration.example.json`" > FITConfiguration.json
+      #     echo "`jq --arg e "${{ github.event.inputs.server-version }}" '.situational.cbdino.version=$e' FITConfiguration.json`" > FITConfiguration.json
+      #     echo "`jq --arg e "${{ github.event.inputs.server-image }}" '.situational.cbdino.image=$e' FITConfiguration.json`" > FITConfiguration.json
+      #     echo "`jq --arg e "${{ vars.DEPLOYER }}" '.situational.cbdino.deployer=$e' FITConfiguration.json`" > FITConfiguration.json
+      #     echo "`jq --arg e "${{ vars.REGION }}" '.situational.cbdino.region=$e' FITConfiguration.json`" > FITConfiguration.json
+      #     echo "`jq --arg e "${{ vars.CBDINO_PATH }}" '.situational.cbdino.cbDinoClusterAppPath=$e' FITConfiguration.json`" > FITConfiguration.json
+      #     echo "`jq --arg e "${{ vars.PGHOST }}" '.situational.database.jdbc=$e' FITConfiguration.json`" > FITConfiguration.json
+      #     echo "`jq --arg e "${{ vars.PGUSERNAME }}" '.situational.database.username=$e' FITConfiguration.json`" > FITConfiguration.json
+      #     echo "`jq --arg e "${{ secrets.PG_PASSWORD }}" '.situational.database.password=$e' FITConfiguration.json`" > FITConfiguration.json
+      #     echo "`jq --argjson e "${{ github.event.inputs.private-endpoints }}" '.situational.cbdino.enablePrivateEndpoint=$e' FITConfiguration.json`" > FITConfiguration.json
+      #     echo "`jq --argjson e ${{ toJson(vars.WAIT_TIME_BEFORE_EXECUTE_SITUATION) }} '.situational.cbdino.waitTimeBeforeExecuteSituation = ($e | tonumber)' FITConfiguration.json`" > FITConfiguration.json
           
-          cat FITConfiguration.json
-      - name: build driver docker image
-        run: |
-          cd transactions-fit-performer
-          docker build --no-cache -f test-driver/Dockerfile -t fit/test-driver:latest .
-      - name: Run SIT tests
-        run: |
-         cd transactions-fit-performer
-         mvn -B --projects test-driver --also-make -Dmaven.test.failure.ignore -DfailIfNoTests=false -Dtest=${{ github.event.inputs.run-specific-test }} test -Dgroups=situational,cbDino -DexcludedGroups=openshift,capella
-      - name: Capture ${{ github.event.inputs.sdk }} performer logs
-        if: always()
-        run: |
-         docker logs ${{ github.event.inputs.sdk }}-performer-container
+      #     cat FITConfiguration.json
+      # - name: build driver docker image
+      #   run: |
+      #     cd transactions-fit-performer
+      #     docker build --no-cache -f test-driver/Dockerfile -t fit/test-driver:latest .
+      # - name: Run SIT tests
+      #   run: |
+      #    cd transactions-fit-performer
+      #    mvn -B --projects test-driver --also-make -Dmaven.test.failure.ignore -DfailIfNoTests=false -Dtest=${{ github.event.inputs.run-specific-test }} test -Dgroups=situational,cbDino -DexcludedGroups=openshift,capella
+      # - name: Capture ${{ github.event.inputs.sdk }} performer logs
+      #   if: always()
+      #   run: |
+      #    docker logs ${{ github.event.inputs.sdk }}-performer-container
