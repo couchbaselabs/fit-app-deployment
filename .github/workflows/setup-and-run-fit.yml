@@ -108,12 +108,12 @@ jobs:
               ;;
             ("scala")
               git clone git@github.com:couchbase/couchbase-jvm-clients.git
-              sed -i 's/<root level="INFO">/TRACE/g' scala-fit-performer/src/main/resources/logback.xml
+              sed -i 's/<root level="INFO">/<root level="TRACE">/g' scala-fit-performer/src/main/resources/logback.xml
               cat scala-fit-performer/src/main/resources/logback.xml
               ;;
             ("kotlin")
               git clone git@github.com:couchbase/couchbase-jvm-clients.git
-              sed -i 's/<root level="INFO">/TRACE/g' kotlin-fit-performer/src/main/resources/logback.xml
+              sed -i 's/<root level="INFO">/<root level="TRACE">/g' kotlin-fit-performer/src/main/resources/logback.xml
               cat kotlin-fit-performer/src/main/resources/logback.xml
               ;;
             (*)
@@ -174,6 +174,8 @@ jobs:
           cat transactions-fit-performer/performers/dotnet/Couchbase.Transactions.FitPerformer/Dockerfile_NET6
           sed '/ENTRYPOINT.*]/{s/]/, "includeClientLogs=true"]/;p;}' -i transactions-fit-performer/performers/dotnet/Couchbase.Transactions.FitPerformer/Dockerfile_NET8
           cat transactions-fit-performer/performers/dotnet/Couchbase.Transactions.FitPerformer/Dockerfile_NET8
+          sed -i 's/<var logLevel = LogLevel.Debug;>/<var logLevel = LogLevel.Trace;>/g' transactions-fit-performer/performers/dotnet/Couchbase.Transactions.FitPerformer/Program.cs
+          cat transactions-fit-performer/performers/dotnet/Couchbase.Transactions.FitPerformer/Program.cs
           
       - name: Set isGerrit flag
         id: set_flag
