@@ -130,6 +130,7 @@ jobs:
           CAPELLA_USER: ${{ inputs.sbx-user || vars.CAP_USER }}
           CAPELLA_PASS: ${{ inputs.sbx-password || vars.CAP_PASS }}
         run: |
+          echo "CB_DINO_NAME value is: $CB_DINO_NAME"
           ./$CB_DINO_NAME init --auto
           cat ~/.cbdinocluster
       # - name: clone fit and build gRPC
