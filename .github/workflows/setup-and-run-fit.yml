@@ -121,7 +121,12 @@ jobs:
               ;;
           esac
           sed -i 's/400/100/g' transactions-fit-performer/test-driver/src/test/scala/com/couchbase/situational/runner/SituationalRunner.scala
-          cd transactions-fit-performer/gRPC/jvm
+          sed -i 's/600/120/g' transactions-fit-performer/test-driver/src/test/scala/com/couchbase/situational/tests/CbDinoTest.scala
+          
+          sed -i 's/test-user/Administrator/g' transactions-fit-performer/test-driver/src/test/scala/com/couchbase/situational/cbdino/CbDinoManager.scala
+          sed -i 's/P@ssword1/password/g' transactions-fit-performer/test-driver/src/test/scala/com/couchbase/situational/cbdino/CbDinoManager.scala
+          sed -i 's:client.createDbUser://:g' transactions-fit-performer/test-driver/src/test/scala/com/couchbase/situational/cbdino/CbDinoManager.scala
+
           mvn clean install
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
