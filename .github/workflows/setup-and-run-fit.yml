@@ -126,7 +126,8 @@ jobs:
           sed -i 's/test-user/Administrator/g' transactions-fit-performer/test-driver/src/test/scala/com/couchbase/situational/cbdino/CbDinoManager.scala
           sed -i 's/P@ssword1/password/g' transactions-fit-performer/test-driver/src/test/scala/com/couchbase/situational/cbdino/CbDinoManager.scala
           sed -i 's:client.createDbUser://:g' transactions-fit-performer/test-driver/src/test/scala/com/couchbase/situational/cbdino/CbDinoManager.scala
-
+          
+          cd transactions-fit-performer/gRPC/jvm
           mvn clean install
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
