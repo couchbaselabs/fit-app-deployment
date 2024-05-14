@@ -120,6 +120,7 @@ jobs:
               echo "We are good for this"
               ;;
           esac
+          sed -i 's/400/100/g' transactions-fit-performer/test-driver/src/test/scala/com/couchbase/situational/runner/SituationalRunner.scala
           cd transactions-fit-performer/gRPC/jvm
           mvn clean install
         env:
