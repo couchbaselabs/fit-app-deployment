@@ -117,11 +117,11 @@ jobs:
           wget ${{ vars.CB_DINO_RELEASE_URL }}
           CB_DINO_NAME=$(echo ${{ vars.CB_DINO_RELEASE_URL }} | awk -F'/' '{print $NF}')
           echo "CB_DINO_NAME value is: $CB_DINO_NAME"
-          echo "::set-output name=CB_DINO_NAME::$CB_DINO_NAME"
+          echo "CB_DINO_NAME=$CB_DINO_NAME" >> $GITHUB_ENV
           chmod 744 ./$CB_DINO_NAME
           pwd
-      - name: Set up environment variables
-        run: echo "CB_DINO_NAME=${{ steps.download.outputs.CB_DINO_NAME }}" >> $GITHUB_ENV
+      # - name: Set up environment variables
+      #   run: echo "CB_DINO_NAME=${{ steps.download.outputs.CB_DINO_NAME }}" >> $GITHUB_ENV
       - name: init cbdino cluster for ${{ vars.DEPLOYER }}
         env:
           CB_DINO_NAME: ${{ vars.CB_DINO_NAME }}
