@@ -116,9 +116,12 @@ jobs:
         run: |
           wget ${{ vars.CB_DINO_RELEASE_URL }}
           CB_DINO_NAME=$(echo ${{ vars.CB_DINO_RELEASE_URL }} | awk -F'/' '{print $NF}')
-          echo "Folder name: $CB_DINO_NAME" >> $GITHUB_ENV
+          echo "CB_DINO_NAME value is: $CB_DINO_NAME"
+          echo "Folder name: $CB_DINO_NAME" >> ${{ github.event.inputs.environment }}
           chmod 744 ./$CB_DINO_NAME
           pwd
+        env:
+         CB_DINO_NAME: $CB_DINO_NAME
       - name: init cbdino cluster for ${{ vars.DEPLOYER }}
         env:
           CAPELLA_ENDPOINT: ${{ inputs.sbx-id-api || vars.CAP_END_POINT }}
