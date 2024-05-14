@@ -121,7 +121,7 @@ jobs:
           chmod 744 ./$CB_DINO_NAME
           pwd
         env:
-         CB_DINO_NAME: $CB_DINO_NAME
+         CB_DINO_NAME: ${{ vars.CB_DINO_NAME }}
       - name: init cbdino cluster for ${{ vars.DEPLOYER }}
         env:
           CAPELLA_ENDPOINT: ${{ inputs.sbx-id-api || vars.CAP_END_POINT }}
