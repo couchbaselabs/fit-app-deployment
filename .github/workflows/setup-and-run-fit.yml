@@ -22,33 +22,13 @@ on:
       sdk-version:
         description: SDK version (tag/SHA/Gerrit ref) to checkout
         type: string
-      private-endpoints:
-        description: Run the tests with private endpoints
-        type: choice
-        options:
-        - "true"
-        - "false"
       server-version:
         description: The server version to use on Capella (defaults only currrently, no specific images)
         type: choice
         options:
-        - "7.2"
-        - "7.6"
         - "7.6.1"
       run-specific-test:
         description: Target a specific test to run (i.e. CbDinoTest#rebalance3To5NodesMixedKvAndQuery)
-        type: string
-      sbx-id-api:
-        description: The sandbox api (i.e. https://api.sbx-10.sandbox.nonprod-project-avengers.com) iff using the sbx environment 
-        type: string
-      sbx-org-id:
-        description: The sandbox organisation id to deploy to
-        type: string
-      sbx-user:
-        description: The user for the given sandbox (must already be created)
-        type: string
-      sbx-password:
-        description: The user password for the given sandbox (must already be created)
         type: string
 
 jobs:
@@ -119,11 +99,6 @@ jobs:
           chmod 744 ./cbdinocluster-linux
           pwd
       - name: init cbdino cluster for ${{ vars.DEPLOYER }}
-        env:
-          CAPELLA_ENDPOINT: ${{ inputs.sbx-id-api || vars.CAP_END_POINT }}
-          CAPELLA_OID: ${{ inputs.sbx-org-id || vars.CAP_OID }}
-          CAPELLA_USER: ${{ inputs.sbx-user || vars.CAP_USER }}
-          CAPELLA_PASS: ${{ inputs.sbx-password || vars.CAP_PASS }}
         run: |
           ./cbdinocluster-linux init --auto
           cat ~/.cbdinocluster
@@ -182,7 +157,7 @@ jobs:
           echo "`jq --arg e "${{ vars.PGHOST }}" '.situational.database.jdbc=$e' FITConfiguration.json`" > FITConfiguration.json
           echo "`jq --arg e "${{ vars.PGUSERNAME }}" '.situational.database.username=$e' FITConfiguration.json`" > FITConfiguration.json
           echo "`jq --arg e "${{ secrets.PG_PASSWORD }}" '.situational.database.password=$e' FITConfiguration.json`" > FITConfiguration.json
-          echo "`jq --argjson e "${{ github.event.inputs.private-endpoints }}" '.situational.cbdino.enablePrivateEndpoint=$e' FITConfiguration.json`" > FITConfiguration.json
+          echo "`jq --argjson e "false" '.situational.cbdino.enablePrivateEndpoint=$e' FITConfiguration.json`" > FITConfiguration.json
           cat FITConfiguration.json
       - name: build driver docker image
         run: |
