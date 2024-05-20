@@ -162,8 +162,7 @@ jobs:
               git submodule update --init --force --remote 
               ;;
             ("go")
-              cd transactions-fit-performer/performers/go
-              sed -i 's/logger\.SetLevel(logrus\.InfoLevel)/logger.SetLevel(logrus.DebugLevel)/g' main.go
+              sed -i 's/logger\.SetLevel(logrus\.InfoLevel)/logger.SetLevel(logrus.DebugLevel)/g' transactions-fit-performer/performers/go/main.go
               cat main.go
               ;;
             (*)
