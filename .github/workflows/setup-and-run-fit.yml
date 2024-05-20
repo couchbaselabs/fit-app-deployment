@@ -19,12 +19,9 @@ on:
         - "scala"
         - "kotlin"
         - "php"
-      private-endpoints:
-        description: Run the tests with private endpoints
-        type: choice
-        options:
-        - "true"
-        - "false"
+      sdk-version:
+        description: SDK version (tag/SHA/Gerrit ref) to checkout
+        type: string
       server-version:
         description: The server version to use on Capella (defaults only currrently, no specific images)
         type: choice
@@ -222,7 +219,7 @@ jobs:
           echo "`jq --arg e "${{ vars.PGUSERNAME }}" '.situational.database.username=$e' FITConfiguration.json`" > FITConfiguration.json
           echo "`jq --arg e "${{ secrets.PG_PASSWORD }}" '.situational.database.password=$e' FITConfiguration.json`" > FITConfiguration.json
           echo "`jq --arg e "/opt/actions-runner/_work/fit-app-deployment/fit-app-deployment/server-logs" '.situational.cbdino.downloadServerLogsDestPath=$e' FITConfiguration.json`" > FITConfiguration.json
-          echo "`jq --argjson e "${{ github.event.inputs.private-endpoints }}" '.situational.cbdino.enablePrivateEndpoint=$e' FITConfiguration.json`" > FITConfiguration.json
+          echo "`jq --argjson e "true" '.situational.cbdino.enablePrivateEndpoint=$e' FITConfiguration.json`" > FITConfiguration.json
           echo "`jq --argjson e ${{ toJson(vars.WAIT_TIME_BEFORE_EXECUTE_SITUATION) }} '.situational.cbdino.waitTimeBeforeExecuteSituation = ($e | tonumber)' FITConfiguration.json`" > FITConfiguration.json
           
           cat FITConfiguration.json
