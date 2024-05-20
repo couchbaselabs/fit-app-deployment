@@ -166,7 +166,9 @@ jobs:
               echo "We are good for this"
               ;;
           esac
-          cd transactions-fit-performer/gRPC/jvm
+          cd transactions-fit-performer
+          git reset HEAD~1 --hard
+          cd gRPC/jvm
           mvn clean install
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
