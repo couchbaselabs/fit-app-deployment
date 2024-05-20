@@ -100,7 +100,7 @@ jobs:
           pwd
       - name: init cbdino cluster for ${{ vars.DEPLOYER }}
         run: |
-          ./cbdinocluster-linux init --auto
+          ./cbdinocluster-linux init --auto --docker-network fit
           cat ~/.cbdinocluster
       - name: clone fit and build gRPC
         run: |
