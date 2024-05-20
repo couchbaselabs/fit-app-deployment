@@ -173,7 +173,8 @@ jobs:
         if: ${{ github.event.inputs.sdk == 'go' }}
         run: |
           cd transactions-fit-performer/performers/go
-          sed -i 's/<logger.SetLevel(logrus.InfoLevel)>/<logger.SetLevel(logrus.DebugLevel)>/g' main.go
+          sed -i 's/<logger.SetLevel(logrus.InfoLevel);/<logger.SetLevel(logrus.DebugLevel);/g' main.go
+          # sed -i 's/<logger.SetLevel(logrus.InfoLevel)>/<logger.SetLevel(logrus.DebugLevel)>/g' main.go
           cat main.go
       - name: Collect dotnet performer logs
         if: ${{ github.event.inputs.sdk == 'dotnet' }}
