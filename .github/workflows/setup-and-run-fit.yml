@@ -202,6 +202,9 @@ jobs:
           cd jenkins-sdk
           docker run --network=fit -d --name ${{ github.event.inputs.sdk }}-performer-container -p 8060:8060 ${{ github.event.inputs.sdk }}-performer
           docker logs --follow ${{ github.event.inputs.sdk }}-performer-container 2>&1 | tee ${{ github.event.inputs.sdk }}-performer-container.log &
+      - name: Create directory to collect server logs
+        run: |
+          mkdir server-logs
       - name: Edit values from the FITConfiguration.json
         run: |
           cd transactions-fit-performer/test-driver
@@ -214,6 +217,7 @@ jobs:
           echo "`jq --arg e "${{ vars.PGHOST }}" '.situational.database.jdbc=$e' FITConfiguration.json`" > FITConfiguration.json
           echo "`jq --arg e "${{ vars.PGUSERNAME }}" '.situational.database.username=$e' FITConfiguration.json`" > FITConfiguration.json
           echo "`jq --arg e "${{ secrets.PG_PASSWORD }}" '.situational.database.password=$e' FITConfiguration.json`" > FITConfiguration.json
+          echo "`jq --arg e "/opt/actions-runner/_work/fit-app-deployment/fit-app-deployment/server-logs" '.situational.cbdino.downloadServerLogsDestPath=$e' FITConfiguration.json`" > FITConfiguration.json
           echo "`jq --argjson e "${{ github.event.inputs.private-endpoints }}" '.situational.cbdino.enablePrivateEndpoint=$e' FITConfiguration.json`" > FITConfiguration.json
           echo "`jq --argjson e ${{ toJson(vars.WAIT_TIME_BEFORE_EXECUTE_SITUATION) }} '.situational.cbdino.waitTimeBeforeExecuteSituation = ($e | tonumber)' FITConfiguration.json`" > FITConfiguration.json
           
@@ -232,4 +236,11 @@ jobs:
         with:
           name: performer-logs
           path: jenkins-sdk/${{ github.event.inputs.sdk }}-performer-container.log
+          retention-days: 15
+      - name: Capture Server logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: server-logs
+          path: server-logs
           retention-days: 15
