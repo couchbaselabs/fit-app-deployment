@@ -19,9 +19,12 @@ on:
         - "scala"
         - "kotlin"
         - "php"
-      sdk-version:
-        description: SDK version (tag/SHA/Gerrit ref) to checkout
-        type: string
+      private-endpoints:
+        description: Run the tests with private endpoints
+        type: choice
+        options:
+        - "true"
+        - "false"
       server-version:
         description: The server version to use on Capella (defaults only currrently, no specific images)
         type: choice
