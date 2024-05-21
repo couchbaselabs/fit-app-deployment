@@ -106,13 +106,13 @@ jobs:
             ("scala")
               git clone git@github.com:couchbase/couchbase-jvm-clients.git
               cd couchbase-jvm-clients
-              sed -i 's/<root level="INFO">/<root level="TRACE">/g' scala-fit-performer/src/main/resources/logback.xml
+              sed -i 's/<root level="info">/<root level="trace">/g' scala-fit-performer/src/main/resources/logback.xml
               cat scala-fit-performer/src/main/resources/logback.xml
               ;;
             ("kotlin")
               git clone git@github.com:couchbase/couchbase-jvm-clients.git
               cd couchbase-jvm-clients
-              sed -i 's/<root level="INFO">/<root level="TRACE">/g' kotlin-fit-performer/src/main/resources/logback.xml
+              sed -i 's/<root level="info">/<root level="trace">/g' kotlin-fit-performer/src/main/resources/logback.xml
               cat kotlin-fit-performer/src/main/resources/logback.xml
               ;;
             (*)
