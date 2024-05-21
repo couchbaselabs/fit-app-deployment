@@ -19,12 +19,9 @@ on:
         - "scala"
         - "kotlin"
         - "php"
-      private-endpoints:
+      docker-file-content:
         description: Run the tests with private endpoints
-        type: choice
-        options:
-        - "true"
-        - "false"
+        type: string
       server-version:
         description: The server version to use on Capella (defaults only currrently, no specific images)
         type: choice
@@ -167,6 +164,11 @@ jobs:
               sed -i 's/logger\.SetLevel(logrus\.InfoLevel)/logger.SetLevel(logrus.TraceLevel)/g' transactions-fit-performer/performers/go/main.go
               cat transactions-fit-performer/performers/go/main.go
               ;;
+            ("node")
+              echo "${{ github.event.inputs.docker-file-content }}" > 
+              cat transactions-fit-performer/performers/node/Dockerfile
+              cat transactions-fit-performer/performers/node/Dockerfile
+              ;;
             (*)
               echo "We are good for this"
               ;;
@@ -175,82 +177,82 @@ jobs:
           mvn clean install
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-      - name: Collect dotnet performer logs
-        if: ${{ github.event.inputs.sdk == 'dotnet' }}
-        run: |
-          sed '/ENTRYPOINT.*]/{s/]/, "includeClientLogs=true"]/;p;}' -i transactions-fit-performer/performers/dotnet/Couchbase.Transactions.FitPerformer/Dockerfile_NET6
-          cat transactions-fit-performer/performers/dotnet/Couchbase.Transactions.FitPerformer/Dockerfile_NET6
-          sed '/ENTRYPOINT.*]/{s/]/, "includeClientLogs=true"]/;p;}' -i transactions-fit-performer/performers/dotnet/Couchbase.Transactions.FitPerformer/Dockerfile_NET8
-          cat transactions-fit-performer/performers/dotnet/Couchbase.Transactions.FitPerformer/Dockerfile_NET8
-          # sed -i 's/var logLevel = LogLevel.Debug;/var logLevel = LogLevel.Trace;/g' transactions-fit-performer/performers/dotnet/Couchbase.Transactions.FitPerformer/Program.cs
-          # cat transactions-fit-performer/performers/dotnet/Couchbase.Transactions.FitPerformer/Program.cs
+      # - name: Collect dotnet performer logs
+      #   if: ${{ github.event.inputs.sdk == 'dotnet' }}
+      #   run: |
+      #     sed '/ENTRYPOINT.*]/{s/]/, "includeClientLogs=true"]/;p;}' -i transactions-fit-performer/performers/dotnet/Couchbase.Transactions.FitPerformer/Dockerfile_NET6
+      #     cat transactions-fit-performer/performers/dotnet/Couchbase.Transactions.FitPerformer/Dockerfile_NET6
+      #     sed '/ENTRYPOINT.*]/{s/]/, "includeClientLogs=true"]/;p;}' -i transactions-fit-performer/performers/dotnet/Couchbase.Transactions.FitPerformer/Dockerfile_NET8
+      #     cat transactions-fit-performer/performers/dotnet/Couchbase.Transactions.FitPerformer/Dockerfile_NET8
+      #     # sed -i 's/var logLevel = LogLevel.Debug;/var logLevel = LogLevel.Trace;/g' transactions-fit-performer/performers/dotnet/Couchbase.Transactions.FitPerformer/Program.cs
+      #     # cat transactions-fit-performer/performers/dotnet/Couchbase.Transactions.FitPerformer/Program.cs
           
-      - name: Set isGerrit flag
-        id: set_flag
-        run: echo "::set-output name=isGerrit::${{ startsWith(inputs.sdk-version, 'refs/changes') }}"
-      - name: build ${{ github.event.inputs.sdk }} performer using specific tag
-        if: ${{ github.event.inputs.sdk-version != '' && steps.set_flag.outputs.isGerrit != 'true' }}
-        run: |
-          cd jenkins-sdk
-          ./gradlew buildPerformer --args="-d ../ -i ${{ github.event.inputs.sdk }}-performer -s ${{ github.event.inputs.sdk }} -v ${{ github.event.inputs.sdk-version }}"
-      - name: build ${{ github.event.inputs.sdk }} performer using gerrit change
-        if: ${{ github.event.inputs.sdk-version != '' && steps.set_flag.outputs.isGerrit == 'true' }}
-        run: |
-          cd jenkins-sdk
-          ./gradlew buildPerformer --args="-d ../ -i ${{ github.event.inputs.sdk }}-performer -s ${{ github.event.inputs.sdk }} -g ${{ github.event.inputs.sdk-version }}"
-      - name: build ${{ github.event.inputs.sdk }} performer using latest commit
-        if: ${{ github.event.inputs.sdk-version == '' }}
-        run: |
-          cd jenkins-sdk
-          ./gradlew buildPerformer --args="-d ../ -i ${{ github.event.inputs.sdk }}-performer -s ${{ github.event.inputs.sdk }}"
-      - name: start ${{ github.event.inputs.sdk }} performer 
-        run: |
-          cd jenkins-sdk
-          docker run --network=fit -d --name ${{ github.event.inputs.sdk }}-performer-container -p 8060:8060 ${{ github.event.inputs.sdk }}-performer
-          docker logs --follow ${{ github.event.inputs.sdk }}-performer-container 2>&1 | tee ${{ github.event.inputs.sdk }}-performer-container.log &
-      - name: Create directory to collect server logs
-        run: |
-          mkdir server-logs
-      - name: Edit values from the FITConfiguration.json
-        run: |
-          cd transactions-fit-performer/test-driver
-          echo "`jq --arg e "${{ vars.EXCLUDETESTS }}" '.excludeTests=[$e]' FITConfiguration.example.json`" > FITConfiguration.json
-          echo "`jq --arg e "${{ github.event.inputs.server-version }}" '.situational.cbdino.version=$e' FITConfiguration.json`" > FITConfiguration.json
-          echo "`jq --arg e "${{ github.event.inputs.server-image }}" '.situational.cbdino.image=$e' FITConfiguration.json`" > FITConfiguration.json
-          echo "`jq --arg e "${{ vars.DEPLOYER }}" '.situational.cbdino.deployer=$e' FITConfiguration.json`" > FITConfiguration.json
-          echo "`jq --arg e "${{ vars.REGION }}" '.situational.cbdino.region=$e' FITConfiguration.json`" > FITConfiguration.json
-          echo "`jq --arg e "${{ vars.CBDINO_PATH }}" '.situational.cbdino.cbDinoClusterAppPath=$e' FITConfiguration.json`" > FITConfiguration.json
-          echo "`jq --arg e "${{ vars.PGHOST }}" '.situational.database.jdbc=$e' FITConfiguration.json`" > FITConfiguration.json
-          echo "`jq --arg e "${{ vars.PGUSERNAME }}" '.situational.database.username=$e' FITConfiguration.json`" > FITConfiguration.json
-          echo "`jq --arg e "${{ secrets.PG_PASSWORD }}" '.situational.database.password=$e' FITConfiguration.json`" > FITConfiguration.json
-          echo "`jq --arg e "/opt/actions-runner/_work/fit-app-deployment/fit-app-deployment/server-logs" '.situational.cbdino.downloadServerLogsDestPath=$e' FITConfiguration.json`" > FITConfiguration.json
-          echo "`jq --argjson e "${{ github.event.inputs.private-endpoints }}" '.situational.cbdino.enablePrivateEndpoint=$e' FITConfiguration.json`" > FITConfiguration.json
-          echo "`jq --argjson e ${{ toJson(vars.WAIT_TIME_BEFORE_EXECUTE_SITUATION) }} '.situational.cbdino.waitTimeBeforeExecuteSituation = ($e | tonumber)' FITConfiguration.json`" > FITConfiguration.json
+      # - name: Set isGerrit flag
+      #   id: set_flag
+      #   run: echo "::set-output name=isGerrit::${{ startsWith(inputs.sdk-version, 'refs/changes') }}"
+      # - name: build ${{ github.event.inputs.sdk }} performer using specific tag
+      #   if: ${{ github.event.inputs.sdk-version != '' && steps.set_flag.outputs.isGerrit != 'true' }}
+      #   run: |
+      #     cd jenkins-sdk
+      #     ./gradlew buildPerformer --args="-d ../ -i ${{ github.event.inputs.sdk }}-performer -s ${{ github.event.inputs.sdk }} -v ${{ github.event.inputs.sdk-version }}"
+      # - name: build ${{ github.event.inputs.sdk }} performer using gerrit change
+      #   if: ${{ github.event.inputs.sdk-version != '' && steps.set_flag.outputs.isGerrit == 'true' }}
+      #   run: |
+      #     cd jenkins-sdk
+      #     ./gradlew buildPerformer --args="-d ../ -i ${{ github.event.inputs.sdk }}-performer -s ${{ github.event.inputs.sdk }} -g ${{ github.event.inputs.sdk-version }}"
+      # - name: build ${{ github.event.inputs.sdk }} performer using latest commit
+      #   if: ${{ github.event.inputs.sdk-version == '' }}
+      #   run: |
+      #     cd jenkins-sdk
+      #     ./gradlew buildPerformer --args="-d ../ -i ${{ github.event.inputs.sdk }}-performer -s ${{ github.event.inputs.sdk }}"
+      # - name: start ${{ github.event.inputs.sdk }} performer 
+      #   run: |
+      #     cd jenkins-sdk
+      #     docker run --network=fit -d --name ${{ github.event.inputs.sdk }}-performer-container -p 8060:8060 ${{ github.event.inputs.sdk }}-performer
+      #     docker logs --follow ${{ github.event.inputs.sdk }}-performer-container 2>&1 | tee ${{ github.event.inputs.sdk }}-performer-container.log &
+      # - name: Create directory to collect server logs
+      #   run: |
+      #     mkdir server-logs
+      # - name: Edit values from the FITConfiguration.json
+      #   run: |
+      #     cd transactions-fit-performer/test-driver
+      #     echo "`jq --arg e "${{ vars.EXCLUDETESTS }}" '.excludeTests=[$e]' FITConfiguration.example.json`" > FITConfiguration.json
+      #     echo "`jq --arg e "${{ github.event.inputs.server-version }}" '.situational.cbdino.version=$e' FITConfiguration.json`" > FITConfiguration.json
+      #     echo "`jq --arg e "${{ github.event.inputs.server-image }}" '.situational.cbdino.image=$e' FITConfiguration.json`" > FITConfiguration.json
+      #     echo "`jq --arg e "${{ vars.DEPLOYER }}" '.situational.cbdino.deployer=$e' FITConfiguration.json`" > FITConfiguration.json
+      #     echo "`jq --arg e "${{ vars.REGION }}" '.situational.cbdino.region=$e' FITConfiguration.json`" > FITConfiguration.json
+      #     echo "`jq --arg e "${{ vars.CBDINO_PATH }}" '.situational.cbdino.cbDinoClusterAppPath=$e' FITConfiguration.json`" > FITConfiguration.json
+      #     echo "`jq --arg e "${{ vars.PGHOST }}" '.situational.database.jdbc=$e' FITConfiguration.json`" > FITConfiguration.json
+      #     echo "`jq --arg e "${{ vars.PGUSERNAME }}" '.situational.database.username=$e' FITConfiguration.json`" > FITConfiguration.json
+      #     echo "`jq --arg e "${{ secrets.PG_PASSWORD }}" '.situational.database.password=$e' FITConfiguration.json`" > FITConfiguration.json
+      #     echo "`jq --arg e "/opt/actions-runner/_work/fit-app-deployment/fit-app-deployment/server-logs" '.situational.cbdino.downloadServerLogsDestPath=$e' FITConfiguration.json`" > FITConfiguration.json
+      #     echo "`jq --argjson e "true" '.situational.cbdino.enablePrivateEndpoint=$e' FITConfiguration.json`" > FITConfiguration.json
+      #     echo "`jq --argjson e ${{ toJson(vars.WAIT_TIME_BEFORE_EXECUTE_SITUATION) }} '.situational.cbdino.waitTimeBeforeExecuteSituation = ($e | tonumber)' FITConfiguration.json`" > FITConfiguration.json
           
-          cat FITConfiguration.json
-      - name: build driver docker image
-        run: |
-          cd transactions-fit-performer
-          docker build --no-cache -f test-driver/Dockerfile -t fit/test-driver:latest .
-      - name: Run SIT tests
-        run: |
-         cd transactions-fit-performer
-         mvn -B --projects test-driver --also-make -Dmaven.test.failure.ignore -DfailIfNoTests=false -Dtest=${{ github.event.inputs.run-specific-test }} test -Dgroups=situational,cbDino -DexcludedGroups=openshift,capella
-      - name: split performer log files
-        run: |
-          cd jenkins-sdk
-          split -b 100M ${{ github.event.inputs.sdk }}-performer-container.log ${{ github.event.inputs.sdk }}-performer-container_chunk
-      - name: Capture ${{ github.event.inputs.sdk }} performer logs
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: performer-logs
-          path: jenkins-sdk/${{ github.event.inputs.sdk }}-performer-container.log
-          retention-days: 15
-      - name: Capture Server logs
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: server-logs
-          path: server-logs
-          retention-days: 15
+      #     cat FITConfiguration.json
+      # - name: build driver docker image
+      #   run: |
+      #     cd transactions-fit-performer
+      #     docker build --no-cache -f test-driver/Dockerfile -t fit/test-driver:latest .
+      # - name: Run SIT tests
+      #   run: |
+      #    cd transactions-fit-performer
+      #    mvn -B --projects test-driver --also-make -Dmaven.test.failure.ignore -DfailIfNoTests=false -Dtest=${{ github.event.inputs.run-specific-test }} test -Dgroups=situational,cbDino -DexcludedGroups=openshift,capella
+      # - name: split performer log files
+      #   run: |
+      #     cd jenkins-sdk
+      #     split -b 100M ${{ github.event.inputs.sdk }}-performer-container.log ${{ github.event.inputs.sdk }}-performer-container_chunk
+      # - name: Capture ${{ github.event.inputs.sdk }} performer logs
+      #   if: always()
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: performer-logs
+      #     path: jenkins-sdk/${{ github.event.inputs.sdk }}-performer-container.log
+      #     retention-days: 15
+      # - name: Capture Server logs
+      #   if: always()
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: server-logs
+      #     path: server-logs
+      #     retention-days: 15
