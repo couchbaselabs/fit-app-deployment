@@ -165,7 +165,7 @@ jobs:
               cat transactions-fit-performer/performers/go/main.go
               ;;
             ("node")
-              echo "${{ github.event.inputs.docker-file-content }}" > 
+              echo "${{ github.event.inputs.docker-file-content }}" > transactions-fit-performer/performers/node/Dockerfile
               cat transactions-fit-performer/performers/node/Dockerfile
               ;;
             (*)
