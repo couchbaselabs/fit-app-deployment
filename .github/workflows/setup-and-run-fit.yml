@@ -167,7 +167,6 @@ jobs:
             ("node")
               echo "${{ github.event.inputs.docker-file-content }}" > 
               cat transactions-fit-performer/performers/node/Dockerfile
-              cat transactions-fit-performer/performers/node/Dockerfile
               ;;
             (*)
               echo "We are good for this"
