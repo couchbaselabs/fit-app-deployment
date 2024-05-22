@@ -19,9 +19,12 @@ on:
         - "scala"
         - "kotlin"
         - "php"
-      docker-file-content:
+      private-endpoints:
         description: Run the tests with private endpoints
-        type: string
+        type: choice
+        options:
+        - "true"
+        - "false"
       server-version:
         description: The server version to use on Capella (defaults only currrently, no specific images)
         type: choice
@@ -176,15 +179,15 @@ jobs:
           mvn clean install
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-      - name: Collect dotnet performer logs
-        if: ${{ github.event.inputs.sdk == 'dotnet' }}
-        run: |
-          sed '/ENTRYPOINT.*]/{s/]/, "includeClientLogs=true"]/;p;}' -i transactions-fit-performer/performers/dotnet/Couchbase.Transactions.FitPerformer/Dockerfile_NET6
-          cat transactions-fit-performer/performers/dotnet/Couchbase.Transactions.FitPerformer/Dockerfile_NET6
-          sed '/ENTRYPOINT.*]/{s/]/, "includeClientLogs=true"]/;p;}' -i transactions-fit-performer/performers/dotnet/Couchbase.Transactions.FitPerformer/Dockerfile_NET8
-          cat transactions-fit-performer/performers/dotnet/Couchbase.Transactions.FitPerformer/Dockerfile_NET8
-          # sed -i 's/var logLevel = LogLevel.Debug;/var logLevel = LogLevel.Trace;/g' transactions-fit-performer/performers/dotnet/Couchbase.Transactions.FitPerformer/Program.cs
-          # cat transactions-fit-performer/performers/dotnet/Couchbase.Transactions.FitPerformer/Program.cs
+      # - name: Collect dotnet performer logs
+      #   if: ${{ github.event.inputs.sdk == 'dotnet' }}
+      #   run: |
+      #     sed '/ENTRYPOINT.*]/{s/]/, "includeClientLogs=true"]/;p;}' -i transactions-fit-performer/performers/dotnet/Couchbase.Transactions.FitPerformer/Dockerfile_NET6
+      #     cat transactions-fit-performer/performers/dotnet/Couchbase.Transactions.FitPerformer/Dockerfile_NET6
+      #     sed '/ENTRYPOINT.*]/{s/]/, "includeClientLogs=true"]/;p;}' -i transactions-fit-performer/performers/dotnet/Couchbase.Transactions.FitPerformer/Dockerfile_NET8
+      #     cat transactions-fit-performer/performers/dotnet/Couchbase.Transactions.FitPerformer/Dockerfile_NET8
+      #     # sed -i 's/var logLevel = LogLevel.Debug;/var logLevel = LogLevel.Trace;/g' transactions-fit-performer/performers/dotnet/Couchbase.Transactions.FitPerformer/Program.cs
+      #     # cat transactions-fit-performer/performers/dotnet/Couchbase.Transactions.FitPerformer/Program.cs
           
       - name: Set isGerrit flag
         id: set_flag
@@ -225,7 +228,7 @@ jobs:
           echo "`jq --arg e "${{ vars.PGUSERNAME }}" '.situational.database.username=$e' FITConfiguration.json`" > FITConfiguration.json
           echo "`jq --arg e "${{ secrets.PG_PASSWORD }}" '.situational.database.password=$e' FITConfiguration.json`" > FITConfiguration.json
           echo "`jq --arg e "/opt/actions-runner/_work/fit-app-deployment/fit-app-deployment/server-logs" '.situational.cbdino.downloadServerLogsDestPath=$e' FITConfiguration.json`" > FITConfiguration.json
-          echo "`jq --argjson e "true" '.situational.cbdino.enablePrivateEndpoint=$e' FITConfiguration.json`" > FITConfiguration.json
+          echo "`jq --argjson e "${{ github.event.inputs.private-endpoints }}" '.situational.cbdino.enablePrivateEndpoint=$e' FITConfiguration.json`" > FITConfiguration.json
           echo "`jq --argjson e ${{ toJson(vars.WAIT_TIME_BEFORE_EXECUTE_SITUATION) }} '.situational.cbdino.waitTimeBeforeExecuteSituation = ($e | tonumber)' FITConfiguration.json`" > FITConfiguration.json
           
           cat FITConfiguration.json
