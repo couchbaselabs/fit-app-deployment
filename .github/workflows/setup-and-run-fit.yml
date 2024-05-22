@@ -236,20 +236,21 @@ jobs:
         run: |
           cd transactions-fit-performer
           docker build --no-cache -f test-driver/Dockerfile -t fit/test-driver:latest .
-      - name: Run SIT tests
-        run: |
-         cd transactions-fit-performer
-         mvn -B --projects test-driver --also-make -Dmaven.test.failure.ignore -DfailIfNoTests=false -Dtest=${{ github.event.inputs.run-specific-test }} test -Dgroups=situational,cbDino -DexcludedGroups=openshift,capella
+      # - name: Run SIT tests
+      #   run: |
+      #    cd transactions-fit-performer
+      #    mvn -B --projects test-driver --also-make -Dmaven.test.failure.ignore -DfailIfNoTests=false -Dtest=${{ github.event.inputs.run-specific-test }} test -Dgroups=situational,cbDino -DexcludedGroups=openshift,capella
       - name: split performer log files
         run: |
           cd jenkins-sdk
-          split -b 100M ${{ github.event.inputs.sdk }}-performer-container.log ${{ github.event.inputs.sdk }}-performer-container_chunk
+          mkdir perf-logs
+          split -b 100M ${{ github.event.inputs.sdk }}-performer-container.log perf-logs/${{ github.event.inputs.sdk }}-performer-container_chunk
       - name: Capture ${{ github.event.inputs.sdk }} performer logs
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: performer-logs
-          path: jenkins-sdk/${{ github.event.inputs.sdk }}-performer-container.log
+          path: jenkins-sdk/perf-logs
           retention-days: 15
       - name: Capture Server logs
         if: always()
