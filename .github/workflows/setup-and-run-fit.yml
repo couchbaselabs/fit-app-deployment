@@ -236,10 +236,10 @@ jobs:
         run: |
           cd transactions-fit-performer
           docker build --no-cache -f test-driver/Dockerfile -t fit/test-driver:latest .
-      # - name: Run SIT tests
-      #   run: |
-      #    cd transactions-fit-performer
-      #    mvn -B --projects test-driver --also-make -Dmaven.test.failure.ignore -DfailIfNoTests=false -Dtest=${{ github.event.inputs.run-specific-test }} test -Dgroups=situational,cbDino -DexcludedGroups=openshift,capella
+      - name: Run SIT tests
+        run: |
+         cd transactions-fit-performer
+         mvn -B --projects test-driver --also-make -Dmaven.test.failure.ignore -DfailIfNoTests=false -Dtest=${{ github.event.inputs.run-specific-test }} test -Dgroups=situational,cbDino -DexcludedGroups=openshift,capella
       - name: split performer log files
         run: |
           cd jenkins-sdk
