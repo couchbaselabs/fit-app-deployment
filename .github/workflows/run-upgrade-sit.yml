@@ -185,7 +185,7 @@ jobs:
           cat transactions-fit-performer/performers/dotnet/Couchbase.Transactions.FitPerformer/Dockerfile_NET6
           sed '/ENTRYPOINT.*]/{s/]/, "includeClientLogs=true"]/;p;}' -i transactions-fit-performer/performers/dotnet/Couchbase.Transactions.FitPerformer/Dockerfile_NET8
           cat transactions-fit-performer/performers/dotnet/Couchbase.Transactions.FitPerformer/Dockerfile_NET8
-          sed -i 's/var logLevel = LogLevel.Debug;/var logLevel = LogLevel.Trace;/g' transactions-fit-performer/performers/dotnet/Couchbase.Transactions.FitPerformer/Program.cs
+          sed -i 's/var logLevel = LogLevel.Debug;/var logLevel = LogLevel.Info;/g' transactions-fit-performer/performers/dotnet/Couchbase.Transactions.FitPerformer/Program.cs
           cat transactions-fit-performer/performers/dotnet/Couchbase.Transactions.FitPerformer/Program.cs      
       - name: Set isGerrit flag
         id: set_flag
