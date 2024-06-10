@@ -1,4 +1,4 @@
-name: Run SIT tests with private endpoints
+name: Run SIT with private endpoints
 run-name: ${{ github.actor }} Run SIT tests with private endpoints
 on: 
   workflow_dispatch:
