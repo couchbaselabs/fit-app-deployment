@@ -1,5 +1,5 @@
-name: Run SIT
-run-name: ${{ github.actor }} Run SIT
+name: Run SIT with connection string
+run-name: ${{ github.actor }} Run SIT with connection string
 on: 
   workflow_dispatch:
     inputs:
