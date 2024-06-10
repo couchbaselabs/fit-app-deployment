@@ -124,7 +124,7 @@ jobs:
       #   run: echo "CB_DINO_NAME=${{ steps.download.outputs.CB_DINO_NAME }}" >> $GITHUB_ENV
       - name: init cbdino cluster for ${{ vars.DEPLOYER }}
         env:
-          CB_DINO_NAME: ${{ vars.CB_DINO_NAME }}
+          CB_DINO_NAME: ${{ env.CB_DINO_NAME }}
           CAPELLA_ENDPOINT: ${{ inputs.sbx-id-api || vars.CAP_END_POINT }}
           CAPELLA_OID: ${{ inputs.sbx-org-id || vars.CAP_OID }}
           CAPELLA_USER: ${{ inputs.sbx-user || vars.CAP_USER }}
