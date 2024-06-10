@@ -1,4 +1,4 @@
-name: Run SIT tests with private endpoints
+name: Run upgrade SIT with connection string
 run-name: ${{ github.actor }} Run SIT tests with private endpoints
 on: 
   workflow_dispatch:
@@ -220,7 +220,7 @@ jobs:
           echo "`jq --arg e "${{ vars.PGUSERNAME }}" '.situational.database.username=$e' FITConfiguration.json`" > FITConfiguration.json
           echo "`jq --arg e "${{ secrets.PG_PASSWORD }}" '.situational.database.password=$e' FITConfiguration.json`" > FITConfiguration.json
           echo "`jq --arg e "/opt/actions-runner/_work/fit-app-deployment/fit-app-deployment/server-logs" '.situational.cbdino.downloadServerLogsDestPath=$e' FITConfiguration.json`" > FITConfiguration.json
-          echo "`jq --argjson e "true" '.situational.cbdino.enablePrivateEndpoint=$e' FITConfiguration.json`" > FITConfiguration.json
+          echo "`jq --argjson e "false" '.situational.cbdino.enablePrivateEndpoint=$e' FITConfiguration.json`" > FITConfiguration.json
           echo "`jq --argjson e ${{ toJson(vars.WAIT_TIME_BEFORE_EXECUTE_SITUATION) }} '.situational.cbdino.waitTimeBeforeExecuteSituation = ($e | tonumber)' FITConfiguration.json`" > FITConfiguration.json         
           cat FITConfiguration.json
       - name: build driver docker image
@@ -230,7 +230,7 @@ jobs:
       - name: Run SIT tests
         run: |
          cd transactions-fit-performer
-         mvn -B --projects test-driver --also-make -Dmaven.test.failure.ignore -DfailIfNoTests=false -Dtest=${{ github.event.inputs.run-specific-test }} test -Dgroups=situational,cbDino -DexcludedGroups=openshift,capella
+         mvn -B --projects test-driver --also-make -Dmaven.test.failure.ignore -DfailIfNoTests=false -Dtest=${{ github.event.inputs.run-specific-test }} test -Dgroups=situational,cbDino,upgradeTests -DexcludedGroups=openshift,capella
       - name: Capture ${{ github.event.inputs.sdk }} performer logs
         if: always()
         uses: actions/upload-artifact@v4
