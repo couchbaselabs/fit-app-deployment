@@ -23,7 +23,7 @@ on:
         description: SDK version (tag/SHA/Gerrit ref) to checkout
         type: string
       server-version:
-        description: The server version to use on Capella (defaults only currrently, no specific images)
+        description: The server version to use on Capella
         type: choice
         options:
         - "7.2.4"
@@ -31,7 +31,11 @@ on:
         - "7.1.3"
       server-image:
         description: Add a specific image of the server version
-        type: string
+        type: choice
+        options:
+        - "couchbase-cloud-server-7.1.3-3480"
+        - "couchbase-cloud-server-7.2.4-7075-x86_64-v1.0.29"
+        - "couchbase-cloud-server-7.6.0-2176-x86_64-v1.0.28"
       run-specific-test:
         description: Target a specific upgrade server version test to run (i.e. CbDinoUpgradeTest#updateServerVersionTo761)
         type: string
