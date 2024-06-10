@@ -28,12 +28,6 @@ on:
         options:
         - "7.2"
         - "7.6"
-        - "7.2.4"
-        - "7.6.0"
-        - "7.1.3"
-      server-image:
-        description: Add a specific image of the server version
-        type: string
       run-specific-test:
         description: Target a specific test to run (i.e. CbDinoTest#rebalance3To5NodesMixedKvAndQuery)
         type: string
