@@ -1,5 +1,5 @@
 name: Run upgrade SIT with connection string
-run-name: ${{ github.actor }} Run SIT tests with private endpoints
+run-name: ${{ github.actor }} Run upgrade SIT with connection string
 on: 
   workflow_dispatch:
     inputs:
