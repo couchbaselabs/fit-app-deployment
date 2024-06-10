@@ -26,8 +26,6 @@ on:
         description: The server version to use on Capella (defaults only currrently, no specific images)
         type: choice
         options:
-        - "7.2"
-        - "7.6"
         - "7.2.4"
         - "7.6.0"
         - "7.1.3"
@@ -35,7 +33,7 @@ on:
         description: Add a specific image of the server version
         type: string
       run-specific-test:
-        description: Target a specific test to run (i.e. CbDinoTest#rebalance3To5NodesMixedKvAndQuery)
+        description: Target a specific upgrade server version test to run (i.e. CbDinoUpgradeTest#updateServerVersionTo761)
         type: string
       sbx-id-api:
         description: The sandbox api (i.e. https://api.sbx-10.sandbox.nonprod-project-avengers.com) iff using the sbx environment 
