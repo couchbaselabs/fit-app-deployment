@@ -243,7 +243,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: performer-logs
-          path: jenkins-sdk/perf-logs
+          path: jenkins-sdk/${{ github.event.inputs.sdk }}-performer-container.log
           retention-days: 15
       - name: Capture Server logs
         if: always()
