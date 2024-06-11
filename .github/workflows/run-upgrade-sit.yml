@@ -146,6 +146,7 @@ jobs:
           CAPELLA_USER: ${{ inputs.sbx-user || vars.CAP_USER }}
           CAPELLA_PASS: ${{ inputs.sbx-password || vars.CAP_PASS }}
           CAPELLA_OVERRIDE_TOKEN: ${{ vars.CAP_OVERRIDE_TOKEN }}
+          CAPELLA_INTERNAL_SUPPORT_TOKEN: ${{ vars.CAP_INTERNAL_SUPPORT_TOKEN }}
         run: |
           echo "CB_DINO_NAME value is: $CB_DINO_NAME"
           ./$CB_DINO_NAME init --auto
