@@ -163,10 +163,6 @@ jobs:
               git submodule init
               git submodule update --init --force --remote 
               ;;
-            ("go")
-              sed -i 's/logger\.SetLevel(logrus\.InfoLevel)/logger.SetLevel(logrus.TraceLevel)/g' transactions-fit-performer/performers/go/main.go
-              cat transactions-fit-performer/performers/go/main.go
-              ;;
             ("node")
               echo "${{ github.event.inputs.docker-file-content }}" > transactions-fit-performer/performers/node/Dockerfile
               cat transactions-fit-performer/performers/node/Dockerfile
