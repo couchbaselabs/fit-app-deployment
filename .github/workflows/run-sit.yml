@@ -141,7 +141,7 @@ jobs:
           CAPELLA_INTERNAL_SUPPORT_TOKEN: ${{ vars.CAP_INTERNAL_SUPPORT_TOKEN }}
         run: |
           echo "CB_DINO_NAME value is: $CB_DINO_NAME"
-          /$CB_DINO_NAME init --auto --upload-server-logs-host-name=${{ vars.HOSTNAME_DOWNALOAD_SERVER_LOGS }}
+          ./$CB_DINO_NAME init --auto --upload-server-logs-host-name=${{ vars.HOSTNAME_DOWNALOAD_SERVER_LOGS }}
           cat ~/.cbdinocluster
       - name: clone fit and build gRPC
         run: |
