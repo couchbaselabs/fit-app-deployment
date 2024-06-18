@@ -180,15 +180,15 @@ jobs:
           mvn clean install
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-      - name: Collect dotnet performer logs
-        if: ${{ github.event.inputs.sdk == 'dotnet' }}
-        run: |
-          sed '/ENTRYPOINT.*]/{s/]/, "includeClientLogs=true"]/;p;}' -i transactions-fit-performer/performers/dotnet/Couchbase.Transactions.FitPerformer/Dockerfile_NET6
-          cat transactions-fit-performer/performers/dotnet/Couchbase.Transactions.FitPerformer/Dockerfile_NET6
-          sed '/ENTRYPOINT.*]/{s/]/, "includeClientLogs=true"]/;p;}' -i transactions-fit-performer/performers/dotnet/Couchbase.Transactions.FitPerformer/Dockerfile_NET8
-          cat transactions-fit-performer/performers/dotnet/Couchbase.Transactions.FitPerformer/Dockerfile_NET8
-          sed -i 's/var logLevel = LogLevel.Debug;/var logLevel = LogLevel.Error;/g' transactions-fit-performer/performers/dotnet/Couchbase.Transactions.FitPerformer/Program.cs
-          cat transactions-fit-performer/performers/dotnet/Couchbase.Transactions.FitPerformer/Program.cs      
+#      - name: Collect dotnet performer logs
+#        if: ${{ github.event.inputs.sdk == 'dotnet' }}
+#        run: |
+#          sed '/ENTRYPOINT.*]/{s/]/, "includeClientLogs=true"]/;p;}' -i transactions-fit-performer/performers/dotnet/Couchbase.Transactions.FitPerformer/Dockerfile_NET6
+#          cat transactions-fit-performer/performers/dotnet/Couchbase.Transactions.FitPerformer/Dockerfile_NET6
+#          sed '/ENTRYPOINT.*]/{s/]/, "includeClientLogs=true"]/;p;}' -i transactions-fit-performer/performers/dotnet/Couchbase.Transactions.FitPerformer/Dockerfile_NET8
+#          cat transactions-fit-performer/performers/dotnet/Couchbase.Transactions.FitPerformer/Dockerfile_NET8
+#          sed -i 's/var logLevel = LogLevel.Debug;/var logLevel = LogLevel.Error;/g' transactions-fit-performer/performers/dotnet/Couchbase.Transactions.FitPerformer/Program.cs
+#          cat transactions-fit-performer/performers/dotnet/Couchbase.Transactions.FitPerformer/Program.cs
       - name: Set isGerrit flag
         id: set_flag
         run: echo "::set-output name=isGerrit::${{ startsWith(inputs.sdk-version, 'refs/changes') }}"
