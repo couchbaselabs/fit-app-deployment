@@ -148,11 +148,12 @@ jobs:
           git clone git@github.com:couchbaselabs/transactions-fit-performer.git
           case "${{ github.event.inputs.sdk }}" in
             ("dotnet")
+              cd transactions-fit-performer
               git submodule init
               git submodule update --init --force --remote 
               ;;
             ("cxx")
-              pwd
+              cd transactions-fit-performer
               sed -i 's|RUN git clone https://github.com/couchbaselabs/couchbase-cxx-client --recurse-submodules|RUN git clone https://github.com/couchbaselabs/couchbase-cxx-client --recurse-submodules && \ cd couchbase-cxx-client && \ git fetch origin pull/601/head:hide-tao-json-where-possible|' performers/cpp/Dockerfile
               cat performers/cpp/Dockerfile
               git submodule init
