@@ -159,7 +159,9 @@ jobs:
               git submodule init
               git submodule update --init --force --remote 
               ;;
-            ("cpp")
+            ("cxx")
+              sed -i 's|RUN git clone $SDK_REPO --recurse-submodules|RUN git clone https://github.com/couchbaselabs/couchbase-cxx-client --recurse-submodules \&\& cd couchbase-cxx-client \&\& git fetch origin pull/601/head:hide-tao-json-where-possible|' transactions-fit-performer/performers/cpp/Dockerfile
+              cat transactions-fit-performer/performers/cpp/Dockerfile
               git submodule init
               git submodule update --init --force --remote 
               ;;
