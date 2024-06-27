@@ -93,9 +93,6 @@ jobs:
               ;;
             ("java")
               git clone git@github.com:couchbase/couchbase-jvm-clients.git
-              cd couchbase-jvm-clients
-              sed -i 's/<root level="INFO">/<root level="TRACE">/g' java-fit-performer/src/main/resources/logback.xml
-              cat java-fit-performer/src/main/resources/logback.xml
               ;;
             ("scala")
               git clone git@github.com:couchbase/couchbase-jvm-clients.git
